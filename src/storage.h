@@ -47,9 +47,6 @@ typedef std::vector<Hydrogen> H_vector;
 struct TimeStep {
     O_vector O_atoms;
     H_vector H_atoms;
-    TimeStep() {
-        
-    }
 };
 
 typedef std::vector<TimeStep> TimeSteps;

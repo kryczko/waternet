@@ -7,6 +7,7 @@
 #include "storage.h"
 #include "read_config.h"
 #include "read_data.h"
+#include "edgelist.h"
 
 using namespace std;
 
@@ -26,6 +27,10 @@ int main() {
     }
     if (!read_datafile(info, time_steps)) {
         cout << "Error reading/storing datafile, exiting...\n\n";
+        return 0;
+    }
+    if (!create_edgelist(info, time_steps)) {
+        cout << "Error creating edgelists, exiting...\n\n";
         return 0;
     }
     return 0;

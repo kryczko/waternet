@@ -8,6 +8,7 @@
 #include "read_config.h"
 #include "read_data.h"
 #include "edgelist.h"
+#include "output.h"
 
 using namespace std;
 
@@ -31,6 +32,10 @@ int main() {
     }
     if (!create_edgelist(info, time_steps)) {
         cout << "Error creating edgelists, exiting...\n\n";
+        return 0;
+    }
+    if (!output_edgelist(info, time_steps)) {
+        cout << "Error outputting edgelists, exiting...\n\n";
         return 0;
     }
     return 0;

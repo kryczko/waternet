@@ -24,6 +24,7 @@ struct Oxygen {
     std::vector<double> x_coords;
     std::vector<double> y_coords;
     std::vector<double> z_coords;
+    std::vector<int> nearest_neighbors;
     
     Oxygen() {
         ID = -1;

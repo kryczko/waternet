@@ -1,0 +1,11 @@
+# enter the file name you would like to perform analysis on
+filename: test.xyz
+# enter the lattice constants for your supercell
+lattice_constants:
+    x: 12.41
+    y: 12.41
+    z: 12.41 
+# enter the number of oxygen and hydrogen atoms
+n_atoms:
+    O: 100
+    H: 200

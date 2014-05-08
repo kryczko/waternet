@@ -18,7 +18,10 @@ static inline void parse(const Node& node, const char* key, T& value, bool optio
 
 
 void parse_inputfile(Information& info, const Node& node) {
-    parse(node, "filename", info.filename);
+    const Node& modules = node["modules"];
+    const Node& files = node["filenames"];
+    parse(files, "input", info.input_filename);
+    parse(files, "edgelist_output", info.edgelist_output_filename);
     const Node& lattice_consts = node["lattice_constants"];
     parse(lattice_consts, "x", info.lattice_x);
     parse(lattice_consts, "y", info.lattice_y);

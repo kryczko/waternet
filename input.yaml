@@ -1,10 +1,16 @@
+# perform which modules?
+modules:
+
 # enter the file name you would like to perform analysis on
-filename: test.xyz
+filenames: 
+    input: test.xyz
+    edgelist_output: edges.dat
+    
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 12.41
-    y: 12.41
-    z: 12.41 
+    x: 14.41
+    y: 14.41
+    z: 14.41 
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
     O: 100

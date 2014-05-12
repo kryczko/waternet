@@ -19,6 +19,7 @@ static inline void parse(const Node& node, const char* key, T& value, bool optio
 
 void parse_inputfile(Information& info, const Node& node) {
     const Node& modules = node["modules"];
+    parse(modules, "output_gephi", info.output_gephi);
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);
     parse(files, "edgelist_output", info.edgelist_output_filename);

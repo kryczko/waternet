@@ -37,6 +37,6 @@ int main() {
     if (!output_edgelist(info, time_steps)) {
         cout << "Error outputting edgelists, exiting...\n\n";
         return 0;
-    }
+    } 
     return 0;
 }

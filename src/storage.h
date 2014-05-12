@@ -8,7 +8,7 @@
 struct Information {
     std::string input_filename;
     std::string edgelist_output_filename, in_degree, out_degree, cumulative_degree;
-    bool degree_distributions;
+    bool output_gephi;
     int num_oxygen, num_hydrogen, timesteps;
     double lattice_x, lattice_y, lattice_z;
     int n_frames;
@@ -18,7 +18,7 @@ struct Information {
         edgelist_output_filename = input_filename = in_degree = out_degree = cumulative_degree = "not_a_file";
         n_frames = num_oxygen = num_hydrogen = -1;
         lattice_x = lattice_y = lattice_z = -1.0; 
-        degree_distributions = false;
+        output_gephi = false;
     }
 };
 

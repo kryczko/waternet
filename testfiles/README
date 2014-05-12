@@ -1,0 +1,7 @@
+test1: 
+
+	test 1 is a test to see if the network created is a complete circuit
+
+test2:
+
+	this tests periodic boundary conditions, make sure you set the supercell dimensions to [10, 10, 10]

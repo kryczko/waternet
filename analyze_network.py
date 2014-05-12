@@ -35,7 +35,7 @@ def report_final_stats():
     t6 = time.clock()
     print '%f seconds elapsed in total\n' % (t6-t0)
 
-def main():
+def run_main():
     file = str(sys.argv[1])
     f = open(file, 'r')
     print "\nReading inputfile:", file, "..."
@@ -57,48 +57,49 @@ def main():
     average_number_of_nodes = 0
     timesteps = len(total_edgelist)
     counter = 0
-    #plt.ion()
-    #plt.show()
+    plt.ion()
+    plt.show()
     ac = []
     apl = []
     dia = []
     ae = []
     an = []
     ad = []
+    second_counter = 0
     for edgelist in total_edgelist: 
-        Directed_G = nx.DiGraph(edgelist)
-        Undirected_G = Directed_G.to_undirected()
-       # plt.figure(figsize=(8,8))
-        #nx.draw(Directed_G,pos=nx.random_layout(Directed_G))
-        #plt.draw()
-        #time.sleep(0.1)
+        if (second_counter % 10 == 0):
+            Directed_G = nx.DiGraph(edgelist)
+            Undirected_G = Directed_G.to_undirected()
+            plt.figure(figsize=(8,8))
+            nx.draw(Directed_G,pos=nx.spring_layout(Directed_G))
+            plt.draw()
+            time.sleep(0.1)
 
-        # compute other things
-        average_clustering += compute_clustering_coefficient(Directed_G, Undirected_G)
-        average_path_length += average_shortest_path(Directed_G, Undirected_G)
-        #average_diameter += nx.diameter(Undirected_G);
-        average_number_of_edges += nx.number_of_edges(Undirected_G);
-        average_number_of_nodes += nx.number_of_nodes(Undirected_G);
-        average_degree = float(average_number_of_edges) / average_number_of_nodes
-        
-        print "Timestep: ", counter
-        #print "Average diameter:", average_diameter / (counter + 1)
-        #dia.append(average_diameter / (counter + 1))
-        print "Average clustering coefficient:", average_clustering / (counter + 1)
-        ac.append(average_clustering / (counter + 1))
-        print "Average path length:", average_path_length / (counter + 1)
-        apl.append(average_path_length / (counter + 1))
-        print "Average number of edges:", float(average_number_of_edges) / (counter + 1)
-        ae.append(average_number_of_edges / (counter + 1))
-        print "Average number of nodes involved in network:", float(average_number_of_nodes) / (counter + 1)
-        an.append(average_number_of_nodes / (counter + 1))
-        print "Degrees:\n[0, 1, 2, 3, 4 ,5]"
-        ad.append(average_degree)
-        print nx.degree_histogram(Undirected_G)
-        opl = open("clustering_time.dat", 'w')
-        
-        report_final_stats()
-        counter += 1
+            # compute other things
+            average_clustering += compute_clustering_coefficient(Directed_G, Undirected_G)
+            average_path_length += average_shortest_path(Directed_G, Undirected_G)
+            #average_diameter += nx.diameter(Undirected_G);
+            average_number_of_edges += nx.number_of_edges(Undirected_G);
+            average_number_of_nodes += nx.number_of_nodes(Undirected_G);
+            average_degree = float(average_number_of_edges) / average_number_of_nodes
+            print "Timestep: ", second_counter
+            #print "Average diameter:", average_diameter / (counter + 1)
+            #dia.append(average_diameter / (counter + 1))
+            print "Average clustering coefficient:", average_clustering / (counter + 1)
+            ac.append(average_clustering / (counter + 1))
+            print "Average path length:", average_path_length / (counter + 1)
+            apl.append(average_path_length / (counter + 1))
+            print "Average number of edges:", float(average_number_of_edges) / (counter + 1)
+            ae.append(average_number_of_edges / (counter + 1))
+            print "Average number of nodes involved in network:", float(average_number_of_nodes) / (counter + 1)
+            an.append(average_number_of_nodes / (counter + 1))
+            print "Degrees:\n[0, 1, 2, 3, 4 ,5]"
+            ad.append(average_degree)
+            print nx.degree_histogram(Undirected_G)
+           
+            report_final_stats()
+            counter += 1
+        second_counter += 1
     opl = open("clustering_time.dat", 'w')
     i = 0
     for elem in ac:
@@ -109,5 +110,8 @@ def main():
     for elem in apl:
         avpl.write("%i\t%f\n" % (j, elem))
         j += 1
+
+def main():
+    run_main()
 if __name__ == "__main__":
     main()

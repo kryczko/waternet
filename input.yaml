@@ -1,17 +1,17 @@
 # perform which modules?
 modules:
-
+    output_gephi: true
 # enter the file name you would like to perform analysis on
 filenames: 
-    input: test.xyz
+    input: testfiles/test1
     edgelist_output: edges.dat
     
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 14.41
-    y: 14.41
-    z: 14.41 
+    x: 50.0
+    y: 50.0
+    z: 50.0 
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
-    O: 100
-    H: 200
+    O: 5
+    H: 10

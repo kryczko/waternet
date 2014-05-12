@@ -52,11 +52,19 @@ double angle_between(Oxygen& O1, Oxygen& O2, Hydrogen& H, Information& info) {
     double hdy = H.y_coords - O1.y_coords;
     double hdz = H.z_coords - O1.z_coords;
     
+    odx -= info.lattice_x * pbc_round(odx/info.lattice_x);
+    ody -= info.lattice_y * pbc_round(ody/info.lattice_y);
+    odz -= info.lattice_z * pbc_round(odz/info.lattice_z);
+    hdx -= info.lattice_x * pbc_round(hdx/info.lattice_x);
+    hdy -= info.lattice_y * pbc_round(hdy/info.lattice_y);
+    hdz -= info.lattice_z * pbc_round(hdz/info.lattice_z);
+    
     double oodist = OOdist(O1, O2, info);
     double ohdist = OHdist(O1, H, info);
     
     double dot = odx*hdx + ody*hdy + odz*hdz;
     double angle = acos( dot / ( oodist*ohdist )) * rtd;
+    
     return angle;
 }
 
@@ -116,10 +124,20 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
             nearest_neighbors(info, O, Ovec);
+        }
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
             find_local_H(info, O, Hvec);
+        }
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
             find_H_bonds(O, Hvec, Ovec, info);
+        }
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
             check_final_bonds(O, Ovec, Hvec, info);
         }
+        
     }
     cout << "Computed nearest neighbour lists...\n\n";
     return true;

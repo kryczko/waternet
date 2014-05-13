@@ -57,8 +57,8 @@ def run_main():
     average_number_of_nodes = 0
     timesteps = len(total_edgelist)
     counter = 0
-    plt.ion()
-    plt.show()
+    #plt.ion()
+    #plt.show()
     ac = []
     apl = []
     dia = []
@@ -70,10 +70,10 @@ def run_main():
         if (second_counter % 10 == 0):
             Directed_G = nx.DiGraph(edgelist)
             Undirected_G = Directed_G.to_undirected()
-            plt.figure(figsize=(8,8))
-            nx.draw(Directed_G,pos=nx.spring_layout(Directed_G))
-            plt.draw()
-            time.sleep(0.1)
+            #plt.figure(figsize=(8,8))
+            #nx.draw(Directed_G,pos=nx.spring_layout(Directed_G))
+            #plt.draw()
+            #time.sleep(0.1)
 
             # compute other things
             average_clustering += compute_clustering_coefficient(Directed_G, Undirected_G)

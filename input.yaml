@@ -1,17 +1,55 @@
 # perform which modules?
 modules:
+    # create a graph xml file 
     output_gephi: true
+    label_bins: 5
+    
+    # create a data file to plot the degree along the z-axis
+    degree_z: true
+    degree_bins: 100
+    
+    # create a data file to plot neighboring O-O distance distribution
+    OOdistro: true
+    OO_bins: 100
+    OO_max_dist: 5.0
+    
+    # create a data file to plot local O-H distance distribution
+    OHdistro: true
+    OH_bins: 100
+    OH_max_dist: 2.0
+    
+    # create a data file to plot local H-O-H angle distribution
+    HOHdistro: true
+    HOH_bins: 100
+    
+    # create a data file for the cumulative degree distribution (coordination number)
+    degree_distro: true
+    
+    # create data files for each coordinate (x, y, and z) with density profiles
+    density: true
+    density_bins: 100
+    heavy_water: false
+    
 # enter the file name you would like to perform analysis on
 filenames: 
-    input: testfiles/test1
+    input: xyzfiles/test.xyz
     edgelist_output: edges.dat
+    gephi_output: Hbond_graph.gexf
+    degree_z_output: degree_z.dat
+    OOdistro_output: OOdistro.dat
+    OHdistro_output: OHdistro.dat
+    HOHdistro_output: HOHdistro.dat
+    degree_distro_output: degree_distro.dat
+    x_density_output: xdensity.dat
+    y_density_output: ydensity.dat
+    z_density_output: zdensity.dat
     
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 50.0
-    y: 50.0
-    z: 50.0 
+    x: 14.41
+    y: 14.41
+    z: 14.41
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
-    O: 5
-    H: 10
+    O: 100
+    H: 200

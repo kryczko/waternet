@@ -1,3 +1,19 @@
                       ************* WATERNET *************
 
 This code has modules for computing different distributions for atomic trajectories of water.
+The input file type MUST be an xyz file. See the file "input.yaml" before running the main executible
+'main' found in the directory 'src'. The input file allows you to adjust some parameters like the 
+number of oxygen atoms, hydrogen atoms, supercell dimensions, and it allows you to turn on/off 
+modules. If a module is selected, there will be a message outputted to the screen upon completion
+of the module. Since the dependency for libyaml is included in the directory, you do not need 
+to install anything. 
+
+                     TO RUN: './src/main'
+
+                             OR
+                             
+                         './run_network_stats.sh'
+                         
+where the bash script will run main first and then compute network theory observables on the 
+hydrogen bonded network formed in the atomic trajectories. For more information, please email me
+at kevin.ryczko@uoit.net.

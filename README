@@ -1,3 +1,3 @@
                       ************* WATERNET *************
 
-This code will perform routine network analysis functions built into Python's networkx code. 
+This code has modules for computing different distributions for atomic trajectories of water.

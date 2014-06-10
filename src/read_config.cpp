@@ -35,6 +35,12 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "density", info.density);
     parse(modules, "density_bins", info.density_bins);
     parse(modules, "heavy_water", info.heavy_water);
+    parse(modules, "mean_square_displacement", info.msd);
+    parse(modules, "orientation", info.orientation);
+    parse(modules, "orient_x_bins", info.orient_x_bins);
+    parse(modules, "orient_y_bins", info.orient_y_bins);
+    parse(modules, "orient_z_bins", info.orient_z_bins);
+    
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);
     parse(files, "edgelist_output", info.edgelist_output_filename);
@@ -47,6 +53,8 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(files, "x_density_output", info.xdens_output);
     parse(files, "y_density_output", info.ydens_output);
     parse(files, "z_density_output", info.zdens_output);
+    parse(files, "mean_square_displacement_output", info.msd_filename);
+    parse(files, "orientation_output", info.orientation_filename);
     const Node& lattice_consts = node["lattice_constants"];
     parse(lattice_consts, "x", info.lattice_x);
     parse(lattice_consts, "y", info.lattice_y);

@@ -362,15 +362,15 @@ bool msd(Information& info, TimeSteps& time_steps) {
         double dxo = 0, dyo = 0, dzo = 0, dxh = 0, dyh = 0, dzh = 0;
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
-            dxo += wrap(O.x_coords, info.lattice_x);
-            dyo += wrap(O.y_coords, info.lattice_y);
-            dzo += wrap(O.z_coords, info.lattice_z);
+            dxo += O.x_coords;
+            dyo += O.y_coords;
+            dzo += O.z_coords;
         }
         for (int j = 0; j < Hvec.size(); j ++) {
             Hydrogen& H = Hvec[j];
-            dxh += wrap(H.x_coords, info.lattice_x);
-            dyh += wrap(H.y_coords, info.lattice_y);
-            dzh += wrap(H.z_coords, info.lattice_z);
+            dxh += H.x_coords;
+            dyh += H.y_coords;
+            dzh += H.z_coords;
         }
         if (info.heavy_water) {
             double comx = (8*dxo + 2*dxh) / (8*Ovec.size() + 2*Hvec.size());
@@ -479,9 +479,9 @@ bool orientation(Information& info, TimeSteps& time_steps) {
                 vecx.push_back(ohx1 + ohx2);
                 vecy.push_back(ohy1 + ohy2);
                 vecz.push_back(ohz1 + ohz2);
-                posx.push_back(O.x_coords + (ohx1 + ohx2) / 2);
-                posy.push_back(O.y_coords + (ohy1 + ohy2) / 2);
-                posz.push_back(O.z_coords + (ohz1 + ohz2) / 2);
+                posx.push_back(wrap(O.x_coords + (ohx1 + ohx2) / 2, info.lattice_x));
+                posy.push_back(wrap(O.y_coords + (ohy1 + ohy2) / 2, info.lattice_y));
+                posz.push_back(wrap(O.z_coords + (ohz1 + ohz2) / 2, info.lattice_z));
             }
         }
     }
@@ -512,18 +512,32 @@ bool orientation(Information& info, TimeSteps& time_steps) {
     double xinc = info.lattice_x / info.orient_x_bins;
     double yinc = info.lattice_y / info.orient_y_bins;
     double zinc = info.lattice_z / info.orient_z_bins;
-    
     for (int i = 0; i < vecx.size(); i ++) {
         double dot = vecz[i];
         double norm = sqrt( vecx[i]*vecx[i] + vecy[i]*vecy[i] + vecz[i]*vecz[i] );
         double angle = acos ( dot / ( norm ) ) * rtd;
+        
         int xbin = posx[i] / xinc;
         int ybin = posy[i] / yinc;
         int zbin = posz[i] / zinc;
-        xzbins[xbin][zbin] += angle;
-        xzcounts[xbin][zbin] ++;
-        yzbins[ybin][zbin] += angle;
-        yzcounts[ybin][zbin] ++;
+        if (vecx[i] < 0) {
+            angle += 180.0;
+            xzbins[xbin][zbin] += angle;
+            xzcounts[xbin][zbin] ++;
+            angle -= 180.0;
+        } else {
+            xzbins[xbin][zbin] += angle;
+            xzcounts[xbin][zbin] ++;
+        } if (vecy[i] < 0) {
+            angle += 180.0;
+            yzbins[ybin][zbin] += angle;
+            yzcounts[ybin][zbin] ++;
+            angle -= 180.0;
+        } else {
+            yzbins[ybin][zbin] += angle;
+            yzcounts[ybin][zbin] ++;
+        }
+        
         xybins[xbin][ybin] += angle;
         xycounts[xbin][ybin] ++;
     }
@@ -534,26 +548,21 @@ bool orientation(Information& info, TimeSteps& time_steps) {
     outputxz.open(xzfile.c_str());
     outputyz.open(yzfile.c_str());
     outputxy.open(xyfile.c_str());
-    
     for (int i = 0; i < info.orient_x_bins; i ++) {
         for (int j = 0; j < info.orient_z_bins; j ++) {
             if (xzcounts[i][j]) {
                 outputxz << i*xinc << "\t" << j*zinc << "\t" << xzbins[i][j] / xzcounts[i][j] << "\n";
-                outputxz << (i+1)*xinc << "\t" << (j+1)*zinc << "\t" << xzbins[i][j] / xzcounts[i][j] << "\n";
             } else {
                 outputxz << i*xinc << "\t" << j*zinc << "\t" << 0 << "\n";
-                outputxz << (i+1)*xinc << "\t" << (j+1)*zinc << "\t" << 0 << "\n";
             }
         }
     }
     for (int i = 0; i < info.orient_y_bins; i ++) {
         for (int j = 0; j < info.orient_z_bins; j ++) {
-            if (xycounts[i][j]) {
-                outputyz << i*yinc << "\t" << j*zinc << "\t" << xybins[i][j] / xycounts[i][j] << "\n";
-                outputyz << (i+1)*yinc << "\t" << (j+1)*zinc << "\t" << xybins[i][j] / xycounts[i][j] << "\n";
+            if (yzcounts[i][j]) {
+                outputyz << i*yinc << "\t" << j*zinc << "\t" << yzbins[i][j] / yzcounts[i][j] << "\n";
             } else {
                 outputyz << i*yinc << "\t" << j*zinc << "\t" << 0 << "\n";
-                outputyz << (i+1)*yinc << "\t" << (j+1)*zinc << "\t" << 0 << "\n";
             }
         }
     }
@@ -561,10 +570,8 @@ bool orientation(Information& info, TimeSteps& time_steps) {
         for (int j = 0; j < info.orient_y_bins; j ++) {
             if (xycounts[i][j]) {
                 outputxy << i*xinc << "\t" << j*yinc << "\t" << xybins[i][j] / xycounts[i][j] << "\n";
-                outputxy << (i+1)*xinc << "\t" << (j+1)*yinc << "\t" << xybins[i][j] / xycounts[i][j] << "\n";
             } else {
                 outputxy << i*xinc << "\t" << j*yinc << "\t" << 0 << "\n";
-                outputxy << (i+1)*xinc << "\t" << (j+1)*yinc << "\t" << 0 << "\n";
             }
             
         }

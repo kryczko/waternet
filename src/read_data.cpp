@@ -24,6 +24,7 @@ bool read_datafile(Information& info, TimeSteps& time_steps) {
     
     ifstream input;
     input.open(info.input_filename.c_str());
+
     int s = check_time_steps(info);
     
     // declare everything up front

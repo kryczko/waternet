@@ -9,12 +9,14 @@
 #include "read_data.h"
 #include "edgelist.h"
 #include "output.h"
+#include "dynamics.h"
 
 using namespace std;
 
 // declaration of data structures
 Information info;
 TimeSteps time_steps;
+H_group_info hgi;
 
 void print_welcome_message() {
     cout << "\n\t\tWelcome to --waternet--\n\n";
@@ -38,5 +40,9 @@ int main() {
         cout << "Error outputting edgelists, exiting...\n\n";
         return 0;
     } 
+    if (!main_dynamics_func(info, time_steps, hgi)) {
+        cout << "Error with dynamics, exiting...\n\n";
+        return 0;
+    }
     return 0;
 }

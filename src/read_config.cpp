@@ -36,6 +36,9 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "density_bins", info.density_bins);
     parse(modules, "heavy_water", info.heavy_water);
     parse(modules, "mean_square_displacement", info.msd);
+    parse(modules, "time_step", info.time_step);
+    parse(modules, "num_blocks", info.num_blocks);
+    parse(modules, "write_unwrapped_xyz", info.write_unwrapped_xyz);
     parse(modules, "orientation", info.orientation);
     parse(modules, "orient_x_bins", info.orient_x_bins);
     parse(modules, "orient_y_bins", info.orient_y_bins);
@@ -59,6 +62,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(files, "orientation_output", info.orientation_filename);
     parse(files, "H_group_trajectory", info.H_group_trajectory_filename);
     parse(files, "OH_group_trajectory", info.OH_group_trajectory_filename);
+    parse(files, "unwrapped_coords", info.unwrapped_coords);
     
     const Node& lattice_consts = node["lattice_constants"];
     parse(lattice_consts, "x", info.lattice_x);

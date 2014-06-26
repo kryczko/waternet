@@ -282,25 +282,37 @@ double wrap(double value, double lattice) {
 }
 
 bool density(Information& info, TimeSteps& time_steps) {
-    vector<int> xbins (info.density_bins), ybins (info.density_bins), zbins (info.density_bins);
+    vector<int> xbins (info.density_bins), ybins (info.density_bins), zbins (info.density_bins),
+                O_xbins(info.density_bins), O_ybins(info.density_bins), O_zbins(info.density_bins),
+                H_xbins(info.density_bins), H_ybins(info.density_bins), H_zbins(info.density_bins);
     for (int i = 0; i < info.density_bins; i ++) {
         xbins[i] = 0;
         ybins[i] = 0;
         zbins[i] = 0;
+        O_xbins[i] = 0;
+        O_ybins[i] = 0;
+        O_zbins[i] = 0;
+        H_xbins[i] = 0;
+        H_ybins[i] = 0;
+        H_zbins[i] = 0;
+        
     }
     double xbinsize = info.lattice_x / info.density_bins;
     double ybinsize = info.lattice_y / info.density_bins;
     double zbinsize = info.lattice_z / info.density_bins;
     
-    double conversion;
+    double conversion, O_conversion = 16.0e-6/(6.023e23*1.0e-30), H_conversion;
     if (info.heavy_water) {
+        H_conversion = 2.0e-6/(6.023e23*1.0e-30);
         conversion = 20.0e-6/(6.023e23*1.0e-30);
     } else {
+        H_conversion = 1.0e-6/(6.023e23*1.0e-30);
         conversion = 18.0e-6/(6.023e23*1.0e-30);
     }
     
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
+        H_vector& Hvec = time_steps[i].H_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
             double x = wrap(O.x_coords, info.lattice_x);
@@ -312,15 +324,36 @@ bool density(Information& info, TimeSteps& time_steps) {
             xbins[xbin] ++;
             ybins[ybin] ++;
             zbins[zbin] ++;
+            O_xbins[xbin] ++;
+            O_ybins[ybin] ++;
+            O_zbins[zbin] ++;
+        }
+        for (int j = 0; j < Hvec.size(); j ++) {
+            Hydrogen& H = Hvec[j];
+            double x = wrap(H.x_coords, info.lattice_x);
+            double y = wrap(H.y_coords, info.lattice_y);
+            double z = wrap(H.z_coords, info.lattice_z);
+            int xbin = x / xbinsize;
+            int ybin = y / ybinsize;
+            int zbin = z / zbinsize;
+            H_xbins[xbin] ++;
+            H_ybins[ybin] ++;
+            H_zbins[zbin] ++;
         }
     }
     double xvol = xbinsize*info.lattice_y*info.lattice_z, yvol = ybinsize*info.lattice_x*info.lattice_z, zvol = zbinsize*info.lattice_x*info.lattice_y;
-    double xsum = 0, ysum = 0, zsum = 0;
-    int xcount = 0, ycount = 0, zcount = 0;
+    double xsum = 0, ysum = 0, zsum = 0, O_xsum = 0, O_ysum = 0, O_zsum = 0, H_xsum = 0, H_ysum = 0, H_zsum = 0;
+    int xcount = 0, ycount = 0, zcount = 0, O_xcount = 0, O_ycount = 0, O_zcount = 0, H_xcount = 0, H_ycount = 0, H_zcount = 0;
     for (int i = 0; i < info.density_bins; i ++ ) {
         xsum += xbins[i]*conversion / (xvol*info.n_frames);
         ysum += ybins[i]*conversion / (yvol*info.n_frames);
         zsum += zbins[i]*conversion / (zvol*info.n_frames);
+        O_xsum += O_xbins[i]*conversion / (xvol*info.n_frames);
+        O_ysum += O_ybins[i]*conversion / (yvol*info.n_frames);
+        O_zsum += O_zbins[i]*conversion / (zvol*info.n_frames);
+        H_xsum += H_xbins[i]*0.5*conversion / (xvol*info.n_frames);
+        H_ysum += H_ybins[i]*0.5*conversion / (yvol*info.n_frames);
+        H_zsum += H_zbins[i]*0.5*conversion / (zvol*info.n_frames);
         if (xbins[i]) {
             xcount ++;
         }
@@ -330,21 +363,37 @@ bool density(Information& info, TimeSteps& time_steps) {
         if (zbins[i]) {
             zcount ++;
         }
+        if (O_xbins[i]) {
+            O_xcount ++;
+        }
+        if (O_ybins[i]) {
+            O_ycount ++;
+        }
+        if (O_zbins[i]) {
+            O_zcount ++;
+        }
+        if (H_xbins[i]) {
+            H_xcount ++;
+        }
+        if (H_ybins[i]) {
+            H_ycount ++;
+        }
+        if (H_zbins[i]) {
+            H_zcount ++;
+        }
     }
     ofstream xoutput, youtput, zoutput;
     xoutput.open(info.xdens_output.c_str());
     youtput.open(info.ydens_output.c_str());
     zoutput.open(info.zdens_output.c_str());
-    xoutput << "# xpos\tdensity (g/cc)\taverage\n\n";
-    youtput << "# ypos\tdensity (g/cc)\taverage\n\n";
-    zoutput << "# zpos\tdensity (g/cc)\taverage\n\n";
+
     for (int i = 0; i < info.density_bins; i ++) {
-        xoutput << i*xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << xsum / xcount << "\n";
-        xoutput << i*xbinsize + xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << xsum / xcount << "\n";
-        youtput << i*ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << ysum / ycount << "\n";
-        youtput << i*ybinsize + ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << ysum / ycount<< "\n";
-        zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\n";
-        zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\n";
+        xoutput << i*xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
+        xoutput << i*xbinsize + xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
+        youtput << i*ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
+        youtput << i*ybinsize + ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
+        zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
+        zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
     }
     xoutput.close();
     youtput.close();
@@ -352,103 +401,184 @@ bool density(Information& info, TimeSteps& time_steps) {
     return true;
 }
 
+void unwrap(Information& info, TimeSteps& time_steps) {
+    for (int i = 1; i < time_steps.size(); i ++) {
+        O_vector& Ovec0 = time_steps[i - 1].O_atoms;
+        O_vector& Ovec1 = time_steps[i].O_atoms;
+        H_vector& Hvec0 = time_steps[i - 1].H_atoms;
+        H_vector& Hvec1 = time_steps[i].H_atoms;
+        if (i == 1) {
+            for (int j = 0; j < Ovec0.size(); j ++) {
+                Ovec0[j].unwrap_x = Ovec0[j].x_coords;
+                Ovec0[j].unwrap_y = Ovec0[j].y_coords;
+                Ovec0[j].unwrap_z = Ovec0[j].z_coords;
+            }
+            for (int j = 0; j < Hvec0.size(); j ++) {
+                Hvec0[j].unwrap_x = Hvec0[j].x_coords;
+                Hvec0[j].unwrap_y = Hvec0[j].y_coords;
+                Hvec0[j].unwrap_z = Hvec0[j].z_coords;
+            }
+        }
+        for (int j = 0; j < Ovec0.size() ; j ++) {
+            if (Ovec1[j].x_coords - Ovec0[j].unwrap_x > (info.lattice_x / 2.0)) {
+                Ovec1[j].unwrap_x = Ovec1[j].x_coords - info.lattice_x;
+            } else if (Ovec1[j].x_coords - Ovec0[j].unwrap_x < (-info.lattice_x / 2.0)) {
+                Ovec1[j].unwrap_x = Ovec1[j].x_coords + info.lattice_x;
+            } else {
+                Ovec1[j].unwrap_x = Ovec1[j].x_coords;
+            }
+            if (Ovec1[j].y_coords - Ovec0[j].unwrap_y > (info.lattice_y / 2.0)) {
+                Ovec1[j].unwrap_y = Ovec1[j].y_coords - info.lattice_y;
+            } else if (Ovec1[j].y_coords - Ovec0[j].unwrap_y < (-info.lattice_y / 2.0)) {
+                Ovec1[j].unwrap_y = Ovec1[j].y_coords + info.lattice_y;
+            } else {
+                Ovec1[j].unwrap_y = Ovec1[j].y_coords;
+            }
+            if (Ovec1[j].z_coords - Ovec0[j].unwrap_z > (info.lattice_z / 2.0)) {
+                Ovec1[j].unwrap_z = Ovec1[j].z_coords - info.lattice_z;
+            } else if (Ovec1[j].z_coords - Ovec0[j].unwrap_z < (-info.lattice_z / 2.0)) {
+                Ovec1[j].unwrap_z = Ovec1[j].z_coords + info.lattice_z;
+            } else {
+                Ovec1[j].unwrap_z = Ovec1[j].z_coords;
+            }
+        }
+        for (int j = 0; j < Hvec0.size() ; j ++) {
+            if (Hvec1[j].x_coords - Hvec0[j].unwrap_x > (info.lattice_x / 2.0)) {
+                Hvec1[j].unwrap_x = Hvec1[j].x_coords - info.lattice_x;
+            } else if (Hvec1[j].x_coords - Hvec0[j].unwrap_x < (-info.lattice_x / 2.0)) {
+                Hvec1[j].unwrap_x = Hvec1[j].x_coords + info.lattice_x;
+            } else {
+                Hvec1[j].unwrap_x = Hvec1[j].x_coords;
+            }
+            if (Hvec1[j].y_coords - Hvec0[j].unwrap_y > info.lattice_y / 2.0) {
+                Hvec1[j].unwrap_y = Hvec1[j].y_coords - info.lattice_y;
+            } else if (Hvec1[j].y_coords - Hvec0[j].unwrap_y < -info.lattice_y / 2.0) {
+                Hvec1[j].unwrap_y = Hvec1[j].y_coords + info.lattice_y;
+            } else {
+                Hvec1[j].unwrap_y = Hvec1[j].y_coords;
+            }
+            if (Hvec1[j].z_coords - Hvec0[j].unwrap_z > info.lattice_z / 2.0) {
+                Hvec1[j].unwrap_z = Hvec1[j].z_coords - info.lattice_z;
+            } else if (Hvec1[j].z_coords - Hvec0[j].unwrap_z < -info.lattice_z / 2.0) {
+                Hvec1[j].unwrap_z = Hvec1[j].z_coords + info.lattice_z;
+            } else {
+                Hvec1[j].unwrap_z = Hvec1[j].z_coords;
+            }
+        }
+    }
+    if (info.write_unwrapped_xyz) {
+        ofstream output;
+        cout << "Writing unwrapped coordinates to: " << info.unwrapped_coords << "\n\n";
+        output.open(info.unwrapped_coords.c_str());
+        for (int i = 0; i < time_steps.size(); i++) {
+            O_vector& Ovec = time_steps[i].O_atoms;
+            H_vector& Hvec = time_steps[i].H_atoms;
+            output << info.num_oxygen + info.num_hydrogen << "\n\n";
+            for (int j = 0; j < Ovec.size(); j ++) {
+                output << "O" << "\t" << Ovec[j].unwrap_x << "\t" << Ovec[j].unwrap_y << "\t" << Ovec[j].unwrap_z << "\n";
+            }
+            for (int j = 0; j < Hvec.size(); j ++) {
+                output << "H" << "\t" << Hvec[j].unwrap_x << "\t" << Hvec[j].unwrap_y << "\t" << Hvec[j].unwrap_z << "\n";
+            }
+        }
+        cout << "Finished writing unwrapped coordinates.\n\n";  
+    }
+}
+
+
 bool msd(Information& info, TimeSteps& time_steps) {
+    unwrap(info, time_steps);
     ofstream output;
     output.open(info.msd_filename.c_str());
-    vector<double> COMx, COMy, COMz;
-    for (int i = 0; i < time_steps.size(); i ++) {
-        O_vector& Ovec = time_steps[i].O_atoms;
-        H_vector& Hvec = time_steps[i].H_atoms;
-        double dxo = 0, dyo = 0, dzo = 0, dxh = 0, dyh = 0, dzh = 0;
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            dxo += O.x_coords;
-            dyo += O.y_coords;
-            dzo += O.z_coords;
-        }
-        for (int j = 0; j < Hvec.size(); j ++) {
-            Hydrogen& H = Hvec[j];
-            dxh += H.x_coords;
-            dyh += H.y_coords;
-            dzh += H.z_coords;
-        }
-        if (info.heavy_water) {
-            double comx = (8*dxo + 2*dxh) / (8*Ovec.size() + 2*Hvec.size());
-            COMx.push_back(comx);
-            double comy = (8*dyo + 2*dyh) / (8*Ovec.size() + 2*Hvec.size());
-            COMy.push_back(comy);
-            double comz = (8*dzo + 2*dzh) / (8*Ovec.size() + 2*Hvec.size());
-            COMz.push_back(comz);
-        } else {
-            double comx = (8*dxo + dxh) / (8*Ovec.size() + Hvec.size());
-            COMx.push_back(comx);
-            double comy = (8*dyo + dyh) / (8*Ovec.size() + Hvec.size());
-            COMy.push_back(comy);
-            double comz = (8*dzo + dzh) / (8*Ovec.size() + Hvec.size());
-            COMz.push_back(comz);
-        }
-    }
-    vector<double> msd_data(time_steps.size() - 1);
-    for (int i = 0; i < time_steps.size() -1 ; i ++) {
+    int length = time_steps.size() / info.num_blocks;
+    
+    vector<double> msd_data(length*info.num_blocks - 1);
+    vector<int> counts(length*info.num_blocks - 1);
+    for (int i = 0; i < length*info.num_blocks - 1 ; i ++) {
         msd_data[i] = 0;
+        counts[i] = 0;
         
     }
-    O_vector& Ovec1 = time_steps[0].O_atoms;
-    H_vector& Hvec1 = time_steps[0].H_atoms;
-    for (int i = 1; i < time_steps.size(); i ++) {
-        O_vector& Ovec = time_steps[i].O_atoms;
-        H_vector& Hvec = time_steps[i].H_atoms;
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O1 = Ovec1[j];
-            Oxygen& O2 = Ovec[j];
-            double dx1 = O1.x_coords - COMx[0];
-            double dy1 = O1.y_coords - COMy[0];
-            double dz1 = O1.z_coords - COMz[0];   
-            double dx2 = O2.x_coords - COMx[i];
-            double dy2 = O2.y_coords - COMy[i];
-            double dz2 = O2.z_coords - COMz[i];
-            dx1 -= info.lattice_x * pbc_round(dx1/info.lattice_x);
-            dy1 -= info.lattice_y * pbc_round(dy1/info.lattice_y);
-            dz1 -= info.lattice_z * pbc_round(dz1/info.lattice_z);
-            dx2 -= info.lattice_x * pbc_round(dx2/info.lattice_x);
-            dy2 -= info.lattice_y * pbc_round(dy2/info.lattice_y);
-            dz2 -= info.lattice_z * pbc_round(dz2/info.lattice_z);
-            double dx = dx2 - dx1;
-            double dy = dy2 - dy1;
-            double dz = dz2 - dz1;
-            dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
-            dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
-            dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
+    vector<double> COMx(0), COMy(0), COMz(0);
+    
+    for (int nb = 0; nb < info.num_blocks; nb ++) {
+        int starting_step = nb*length;
+
+        for (int len = starting_step; len < length*info.num_blocks; len ++) {
+            int step = len;
+            O_vector& Ovec = time_steps[step].O_atoms;
+            H_vector& Hvec = time_steps[step].H_atoms;
             
-            msd_data[i - 1] += dx*dx + dy*dy + dz*dz;
+            double dxo = 0, dyo = 0, dzo = 0, dxh = 0, dyh = 0, dzh = 0;
+            for (int j = 0; j < Ovec.size(); j ++) {
+                Oxygen& O = Ovec[j];
+                dxo += O.unwrap_x;
+                dyo += O.unwrap_y;
+                dzo += O.unwrap_z;
+            }
+            for (int j = 0; j < Hvec.size(); j ++) {
+                Hydrogen& H = Hvec[j];
+                dxh += H.unwrap_x;
+                dyh += H.unwrap_y;
+                dzh += H.unwrap_z;
+            }
+            if (info.heavy_water) {
+                double comx = (8*dxo + 2*dxh) / (8*Ovec.size() + 2*Hvec.size());
+                COMx.push_back(comx);
+                double comy = (8*dyo + 2*dyh) / (8*Ovec.size() + 2*Hvec.size());
+                COMy.push_back(comy);
+                double comz = (8*dzo + 2*dzh) / (8*Ovec.size() + 2*Hvec.size());
+                COMz.push_back(comz);
+            } else {
+                double comx = (8*dxo + dxh) / (8*Ovec.size() + Hvec.size());
+                COMx.push_back(comx);
+                double comy = (8*dyo + dyh) / (8*Ovec.size() + Hvec.size());
+                COMy.push_back(comy);
+                double comz = (8*dzo + dzh) / (8*Ovec.size() + Hvec.size());
+                COMz.push_back(comz);
+            }
         }
-        for (int j = 0; j < Hvec.size(); j ++) {
-            Hydrogen& H1 = Hvec1[j];
-            Hydrogen& H2 = Hvec[j];
-            double dx1 = H1.x_coords - COMx[0];
-            double dy1 = H1.y_coords - COMy[0];
-            double dz1 = H1.z_coords - COMz[0];   
-            double dx2 = H2.x_coords - COMx[i];
-            double dy2 = H2.y_coords - COMy[i];
-            double dz2 = H2.z_coords - COMz[i];
-            dx1 -= info.lattice_x * pbc_round(dx1/info.lattice_x);
-            dy1 -= info.lattice_y * pbc_round(dy1/info.lattice_y);
-            dz1 -= info.lattice_z * pbc_round(dz1/info.lattice_z);
-            dx2 -= info.lattice_x * pbc_round(dx2/info.lattice_x);
-            dy2 -= info.lattice_y * pbc_round(dy2/info.lattice_y);
-            dz2 -= info.lattice_z * pbc_round(dz2/info.lattice_z);
-            double dx = dx2 - dx1;
-            double dy = dy2 - dy1;
-            double dz = dz2 - dz1;
-            dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
-            dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
-            dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
-            msd_data[i - 1] += dx*dx + dy*dy + dz*dz;
+        O_vector& Ovec1 = time_steps[starting_step].O_atoms;
+        H_vector& Hvec1 = time_steps[starting_step].H_atoms;
+        for (int len = starting_step + 1; len < info.num_blocks*length; len ++) {
+            int step = len;
+            counts[step - 1] ++;
+            O_vector& Ovec = time_steps[step].O_atoms;
+            H_vector& Hvec = time_steps[step].H_atoms;
+            for (int j = 0; j < Ovec.size(); j ++) {
+                Oxygen& O1 = Ovec1[j];
+                Oxygen& O2 = Ovec[j];
+                double dx1 = O1.unwrap_x - COMx[starting_step];
+                double dy1 = O1.unwrap_y - COMy[starting_step];
+                double dz1 = O1.unwrap_z - COMz[starting_step];
+                double dx2 = O2.unwrap_x - COMx[step];
+                double dy2 = O2.unwrap_y - COMy[step];
+                double dz2 = O2.unwrap_z - COMz[step];
+                double dx = dx2 - dx1;
+                double dy = dy2 - dy1;
+                double dz = dz2 - dz1;
+            
+                msd_data[step - 1] += dx*dx + dy*dy + dz*dz;
+            }
+            for (int j = 0; j < Hvec.size(); j ++) {
+                Hydrogen& H1 = Hvec1[j];
+                Hydrogen& H2 = Hvec[j];
+                double dx1 = H1.unwrap_x - COMx[starting_step];
+                double dy1 = H1.unwrap_y - COMy[starting_step];
+                double dz1 = H1.unwrap_z - COMz[starting_step];   
+                double dx2 = H2.unwrap_x - COMx[step];
+                double dy2 = H2.unwrap_y - COMy[step];
+                double dz2 = H2.unwrap_z - COMz[step];
+                double dx = dx2 - dx1;
+                double dy = dy2 - dy1;
+                double dz = dz2 - dz1;
+                
+                msd_data[step - 1] += dx*dx + dy*dy + dz*dz;
+            }
         }
-        msd_data[i - 1] /= (double) (info.num_oxygen + info.num_hydrogen);
     }
-    for (int i = 0; i < time_steps.size() - 1; i ++) {
-        output << i << "\t" << msd_data[i] << "\n";
+    for (int i = 0; i < length*info.num_blocks - 1; i ++) {
+            output << i << "\t" << counts[i] << "\t" << msd_data[i] / ((info.num_oxygen + info.num_hydrogen) * counts[i]) << "\n";
     }
     output.close();
     return true;

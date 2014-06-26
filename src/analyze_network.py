@@ -5,6 +5,7 @@ import networkx as nx
 from networkx import *
 import time
 import sys
+import numpy as np
 
 t0 = time.clock()
 
@@ -38,6 +39,8 @@ def report_final_stats():
 def run_main():
     file = str(sys.argv[1])
     f = open(file, 'r')
+    w = open("cycles_histo.dat", 'w')
+    cycles = np.zeros(100, dtype = int)
     print "\nReading inputfile:", file, "..."
     
     total_edgelist = []
@@ -93,13 +96,22 @@ def run_main():
             ae.append(average_number_of_edges / (counter + 1))
             print "Average number of nodes involved in network:", float(average_number_of_nodes) / (counter + 1)
             an.append(average_number_of_nodes / (counter + 1))
-            print "Degrees:\n[0, 1, 2, 3, 4 ,5]"
+            print "Degrees:\n[0, 1, 2, 3, 4, 5 ,6 ]"
             ad.append(average_degree)
             print nx.degree_histogram(Undirected_G)
+            
+            for node in Undirected_G:
+                for elem in nx.cycle_basis(Undirected_G, node):
+                    if (node in elem):
+                        cycles[len(elem)] += 1 
            
             report_final_stats()
             counter += 1
         second_counter += 1
+    n = 0
+    for elem in cycles:
+        w.write("%f\t%f\n" % (n, elem / float(counter)))
+        n += 1
     opl = open("clustering_time.dat", 'w')
     i = 0
     for elem in ac:

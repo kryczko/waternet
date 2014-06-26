@@ -5,3 +5,7 @@ test1:
 test2:
 
 	this tests periodic boundary conditions, make sure you set the supercell dimensions to [10, 10, 10]
+
+test3:
+
+	this tests the orientation code, and shows why we only have 0 - 180 degrees in the contour plots

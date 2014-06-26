@@ -8,9 +8,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.mlab import griddata
 from matplotlib import cm
+import string
 nooa = 100
 
-f = open('output/orientation_xz.dat', 'r')
+f = open(str(sys.argv[1]), 'r')
 
 xcoords = []
 ycoords = []
@@ -35,15 +36,17 @@ ylist = ycoords               #np.linspace(-2., 1., 100)
 #zlist = zcoords               #np.linspace(-1., 1., 100)
 hblist = hbonds
 
-xi = np.linspace(0., max(xcoords), 100)
-yi = np.linspace(0., max(ycoords), 100)
+xi = np.linspace(min(xcoords), max(xcoords), 100)
+yi = np.linspace(min(ycoords), max(ycoords), 100)
 
 hbi = griddata (xlist, ylist, hblist, xi, yi)
 
-
+v = np.linspace(0, 360, 19, endpoint=True)
 CS = plt.contour(xi,yi,hbi,15,linewidths=0.5,colors='k')
-CS = plt.contourf(xi,yi,hbi,15,cmap=plt.cm.rainbow)
-plt.colorbar()
+CS = plt.contourf(xi,yi,hbi,v,cmap=plt.cm.rainbow)
+plt.colorbar(CS)
+#plt.hlines(13.38, min(xcoords), max(xcoords), linewidth = 4)
+#plt.hlines(34.2, min(xcoords), max(xcoords), linewidth = 4)
 
 rc('font', **{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)

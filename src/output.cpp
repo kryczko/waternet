@@ -492,9 +492,9 @@ bool msd(Information& info, TimeSteps& time_steps) {
     output.open(info.msd_filename.c_str());
     int length = time_steps.size() / info.num_blocks;
     
-    vector<double> msd_data(length*info.num_blocks - 1);
-    vector<int> counts(length*info.num_blocks - 1);
-    for (int i = 0; i < length*info.num_blocks - 1 ; i ++) {
+    vector<double> msd_data(time_steps.size() - 1);
+    vector<int> counts(time_steps.size() - 1);
+    for (int i = 0; i < time_steps.size() - 1 ; i ++) {
         msd_data[i] = 0;
         counts[i] = 0;
         
@@ -504,7 +504,7 @@ bool msd(Information& info, TimeSteps& time_steps) {
     for (int nb = 0; nb < info.num_blocks; nb ++) {
         int starting_step = nb*length;
 
-        for (int len = starting_step; len < length*info.num_blocks; len ++) {
+        for (int len = starting_step; len < time_steps.size(); len ++) {
             int step = len;
             O_vector& Ovec = time_steps[step].O_atoms;
             H_vector& Hvec = time_steps[step].H_atoms;
@@ -540,7 +540,7 @@ bool msd(Information& info, TimeSteps& time_steps) {
         }
         O_vector& Ovec1 = time_steps[starting_step].O_atoms;
         H_vector& Hvec1 = time_steps[starting_step].H_atoms;
-        for (int len = starting_step + 1; len < info.num_blocks*length; len ++) {
+        for (int len = starting_step + 1; len < time_steps.size(); len ++) {
             int step = len;
             counts[step - 1] ++;
             O_vector& Ovec = time_steps[step].O_atoms;

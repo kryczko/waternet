@@ -63,4 +63,22 @@ elif (dim == 2):
     for elem in x1:
         g.write("%f\t%f\t%f\n" % (elem, y1[count2],val1[count2]))
         count2 += 1
+
+
+if (dim == 3):
+        for line in f:
+                i = float(line.split()[0])
+                if (i < 5.0):
+                        i += push
+                        x1.append(i)
+                        val1.append(float(line.split()[1]))
+                else:
+                        x2.append(i)
+                        val2.append(float(line.split()[1]))
+        for elem in x2:
+                g.write("%f\t%f\n" % (elem, val2[count1]))
+                count1 += 1
+        for elem in x1:
+                g.write("%f\t%f\n" % (elem, val1[count2]))
+                count2 += 1
 	

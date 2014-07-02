@@ -6,7 +6,7 @@ modules:
     
     # create a data file to plot the degree along the z-axis
     degree_z: true
-    degree_bins: 25
+    degree_bins: 500
     
     # create a data file to plot neighboring O-O distance distribution
     OOdistro: true
@@ -32,9 +32,9 @@ modules:
     
     # create data file for mean square displacement
     mean_square_displacement: true
-    time_step: 0.1935  # in femtoseconds
-    num_blocks: 100 # number of starting configurations
-    write_unwrapped_xyz: true # write out the unwrapped coordinates
+    time_step: 0.27  # in femtoseconds
+    num_blocks: 500 # number of starting configurations
+    write_unwrapped_xyz: false # write out the unwrapped coordinates
     
     # create data files for contour plots of water molecule orientations
     orientation: true
@@ -42,17 +42,23 @@ modules:
     orient_y_bins: 20
     orient_z_bins: 20
     
-    # run dynamical analysis on the H group - ONLY USE WITH AN H-GROUP XYZ FILE
-    H_group_dynamics: true
+    # run dynamical analysis on the H group - ONLY USE WITH AN H-GROUP XYZ FILE 
+    H_group_dynamics: false
     
     # run dynamical analysis on the OH group - ONLY USE WITH AN OH-GROUP XYZ FILE
     OH_group_dynamics: false
+    
+    # create a contour plotable file for the spacial distribution function
+    spacial_distribution_function: true
+    sdf_z_start: 13.35 # best to make this where your metal is
+    sdf_z_end: 21.0 # best to analyze the density profile and set this value accordingly
+    sdf_bins: 20 # number of bins for atom binning
     
 # enter the file name you would like to perform analysis on
 filenames:
     
     #### MOST IMPORTANT PARAM #### 
-    input: xyzfiles/100_PBE_pure.xyz
+    input: xyzfiles/100_PBE_4lay.xyz
     edgelist_output: output/edges.dat
     gephi_output: output/Hbond_graph.gexf
     degree_z_output: output/degree_z.dat
@@ -68,12 +74,13 @@ filenames:
     H_group_trajectory: output/H_group_trajectory.xyz
     OH_group_trajectory: output/OH_group_trajectory.xyz
     unwrapped_coords: output/unwrapped_coords.xyz
+    spacial_distribution_output: output/sdf_ # the rest of the filename corresponds to the atomtype
     
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 14.41
-    y: 14.41
-    z: 14.41
+    x: 12.33
+    y: 12.81
+    z: 32.796
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
     O: 100

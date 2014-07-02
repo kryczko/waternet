@@ -16,14 +16,18 @@ struct Information {
     int n_frames;
     std::string H_group_trajectory_filename, OH_group_trajectory_filename;
     std::string unwrapped_coords;
+    bool sdf;
+    double sdf_start, sdf_end;
+    int sdf_bins;
+    std::string sdf_output;
     
     Information() {
         // declare incorrect values, so we need to read things in to obtain information
         edgelist_output_filename = input_filename = in_degree = out_degree = cumulative_degree = gephi_output = degree_z_output = unwrapped_coords = "not_a_file";
-        OO_output = OH_output = HOH_output = degree_output = xdens_output = ydens_output = zdens_output = msd_filename = orientation_filename = "notafile";
-        n_frames = num_oxygen = num_hydrogen = -1;
-        H_group_dynamics = OH_group_dynamics = write_unwrapped_xyz = false;
-        lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = -1.0; 
+        OO_output = OH_output = HOH_output = degree_output = xdens_output = ydens_output = zdens_output = msd_filename = orientation_filename = sdf_output = "notafile";
+        n_frames = num_oxygen = num_hydrogen = sdf_bins = -1;
+        H_group_dynamics = OH_group_dynamics = write_unwrapped_xyz = sdf = false;
+        lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = -1.0; 
         output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = false;
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
     }

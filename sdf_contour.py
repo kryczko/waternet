@@ -11,7 +11,16 @@ from matplotlib import cm
 import string
 nooa = 100
 
+circles = []
+
+g = open(str(sys.argv[2]), 'r')
+for line in g:
+    circle = plt.Circle((float(line.split()[0]), float(line.split()[1])), radius=0.6, fc='g', alpha=0.5)
+    circles.append(circle)
+    
+
 f = open(str(sys.argv[1]), 'r')
+
 
 xcoords = []
 ycoords = []
@@ -31,6 +40,9 @@ for line in f.readlines():
 
 plt.figure()
 
+fig = plt.gcf()
+for elem in circles:
+    fig.gca().add_artist(elem)
 xlist = xcoords
 ylist = ycoords               #np.linspace(-2., 1., 100)
 #zlist = zcoords               #np.linspace(-1., 1., 100)
@@ -41,9 +53,9 @@ yi = np.linspace(min(ycoords), max(ycoords), 100)
 
 hbi = griddata (xlist, ylist, hblist, xi, yi)
 
-#v = np.linspace(0, max(hblist), 5, endpoint=True)
+v = np.linspace(0, max(hblist), 6, endpoint=True)
 CS = plt.contour(xi,yi,hbi,15,linewidths=0.5,colors='k')
-CS = plt.contourf(xi,yi,hbi,15,cmap=plt.cm.rainbow)
+CS = plt.contourf(xi,yi,hbi,v,cmap=plt.cm.binary)
 plt.colorbar(CS)
 #plt.hlines(13.38, min(xcoords), max(xcoords), linewidth = 4)
 #plt.hlines(34.2, min(xcoords), max(xcoords), linewidth = 4)
@@ -55,5 +67,6 @@ rc('text', usetex=True)
 #plt.ylabel(r'z-axis [\AA]', size = 'x-large')
 
 #plt.clabel(CS, inline=1, fontsize=10)
+
 plt.show()
 

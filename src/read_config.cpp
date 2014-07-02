@@ -45,6 +45,10 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "orient_z_bins", info.orient_z_bins);
     parse(modules, "H_group_dynamics", info.H_group_dynamics);
     parse(modules, "OH_group_dynamics", info.OH_group_dynamics);
+    parse(modules, "spacial_distribution_function", info.sdf);
+    parse(modules, "sdf_z_start", info.sdf_start);
+    parse(modules, "sdf_z_end", info.sdf_end);
+    parse(modules, "sdf_bins", info.sdf_bins);
     
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);
@@ -63,6 +67,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(files, "H_group_trajectory", info.H_group_trajectory_filename);
     parse(files, "OH_group_trajectory", info.OH_group_trajectory_filename);
     parse(files, "unwrapped_coords", info.unwrapped_coords);
+    parse(files, "spacial_distribution_output", info.sdf_output);
     
     const Node& lattice_consts = node["lattice_constants"];
     parse(lattice_consts, "x", info.lattice_x);

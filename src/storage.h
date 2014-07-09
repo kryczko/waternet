@@ -10,15 +10,15 @@ struct Information {
     std::string edgelist_output_filename, in_degree, out_degree, cumulative_degree, gephi_output, degree_z_output, msd_filename, orientation_filename;
     std::string OO_output, OH_output, HOH_output, degree_output, xdens_output, ydens_output, zdens_output;
     bool output_gephi, degree_z, OODistro, OHDistro, HOHDistro, degree_distro, density, heavy_water, msd, orientation;
-    bool H_group_dynamics, OH_group_dynamics, write_unwrapped_xyz;
+    bool H_group_dynamics, OH_group_dynamics, write_unwrapped_xyz, fix_plots;
     int num_oxygen, num_hydrogen, timesteps, num_blocks, label_bins, degree_bins, OO_bins, OH_bins, HOH_bins, density_bins, orient_x_bins, orient_y_bins, orient_z_bins;
-    double lattice_x, lattice_y, lattice_z, max_OO, max_OH, time_step;
+    double lattice_x, lattice_y, lattice_z, max_OO, max_OH, time_step, cell_block_start, cell_block_end;
     int n_frames;
     std::string H_group_trajectory_filename, OH_group_trajectory_filename;
     std::string unwrapped_coords;
     bool sdf;
-    double sdf_start, sdf_end;
-    int sdf_bins;
+    double sdf_start, sdf_end, starting_z;
+    int sdf_bins, num_cell_blocks;
     std::string sdf_output;
     
     Information() {
@@ -27,9 +27,11 @@ struct Information {
         OO_output = OH_output = HOH_output = degree_output = xdens_output = ydens_output = zdens_output = msd_filename = orientation_filename = sdf_output = "notafile";
         n_frames = num_oxygen = num_hydrogen = sdf_bins = -1;
         H_group_dynamics = OH_group_dynamics = write_unwrapped_xyz = sdf = false;
-        lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = -1.0; 
-        output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = false;
+        lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = cell_block_start = cell_block_end = -1.0; 
+        output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = fix_plots = false;
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
+        starting_z = -1.0;
+        num_cell_blocks = 1;
     }
 };
 

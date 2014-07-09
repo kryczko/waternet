@@ -1,8 +1,27 @@
+# enter the lattice constants for your supercell
+lattice_constants:
+    x: 12.33
+    y: 12.81
+    z: 32.796
+# enter the number of oxygen and hydrogen atoms
+n_atoms:
+    O: 100
+    H: 200
+
 # perform which modules?
 modules:
+    
+    # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
+    num_cell_blocks: 10
+    cell_block_start: 15.0
+    cell_block_end: 35.0
+    
+    # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
+    fix_plots: true
+    starting_z: 5.0
+    
     # create a graph xml file 
     output_gephi: true
-    label_bins: 5
     
     # create a data file to plot the degree along the z-axis
     degree_z: true
@@ -29,7 +48,7 @@ modules:
     density: true
     density_bins: 500
     heavy_water: false
-    
+        
     # create data file for mean square displacement
     mean_square_displacement: true
     time_step: 0.27  # in femtoseconds
@@ -37,10 +56,13 @@ modules:
     write_unwrapped_xyz: false # write out the unwrapped coordinates
     
     # create data files for contour plots of water molecule orientations
-    orientation: true
+    orientation_2D: true
     orient_x_bins: 20
     orient_y_bins: 20
     orient_z_bins: 20
+    
+    # create data files for 1D plots of the orientation for different layers
+    orientation_1D: true
     
     # run dynamical analysis on the H group - ONLY USE WITH AN H-GROUP XYZ FILE 
     H_group_dynamics: false
@@ -54,6 +76,9 @@ modules:
     sdf_z_end: 21.0 # best to analyze the density profile and set this value accordingly
     sdf_bins: 20 # number of bins for atom binning
     
+    # run analysis that calculates the time between water molecules switch partners
+    network_reorganization_time: true
+    
 # enter the file name you would like to perform analysis on
 filenames:
     
@@ -65,23 +90,13 @@ filenames:
     OOdistro_output: output/OOdistro.dat
     OHdistro_output: output/OHdistro.dat
     HOHdistro_output: output/HOHdistro.dat
-    degree_distro_output: output/degree_distro.dat
+    degree_distro_output: output/degree_distro_
     x_density_output: output/xdensity.dat
     y_density_output: output/ydensity.dat
     z_density_output: output/zdensity.dat
-    mean_square_displacement_output: output/msd.dat
-    orientation_output: output/orientation_ # the rest of the name will be added on wrt what the axis are
+    mean_square_displacement_output: output/msd_
+    orientation_2D_output: output/orientation_2D # the rest of the name will be added on wrt what the axis are
     H_group_trajectory: output/H_group_trajectory.xyz
     OH_group_trajectory: output/OH_group_trajectory.xyz
     unwrapped_coords: output/unwrapped_coords.xyz
     spacial_distribution_output: output/sdf_ # the rest of the filename corresponds to the atomtype
-    
-# enter the lattice constants for your supercell
-lattice_constants:
-    x: 12.33
-    y: 12.81
-    z: 32.796
-# enter the number of oxygen and hydrogen atoms
-n_atoms:
-    O: 100
-    H: 200

@@ -19,10 +19,14 @@ static inline void parse(const Node& node, const char* key, T& value, bool optio
 
 void parse_inputfile(Information& info, const Node& node) {
     const Node& modules = node["modules"];
+    parse(modules, "num_cell_blocks", info.num_cell_blocks);
+    parse(modules, "cell_block_start", info.cell_block_start);
+    parse(modules, "cell_block_end", info.cell_block_end);
     parse(modules, "output_gephi", info.output_gephi);
-    parse(modules, "label_bins", info.label_bins);
     parse(modules, "degree_z", info.degree_z);
     parse(modules, "degree_bins", info.degree_bins);
+    parse(modules, "fix_plots", info.fix_plots);
+    parse(modules, "starting_z", info.starting_z);
     parse(modules, "OOdistro", info.OODistro);
     parse(modules, "OO_bins", info.OO_bins);
     parse(modules, "OO_max_dist", info.max_OO);
@@ -32,6 +36,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "HOHdistro", info.HOHDistro);
     parse(modules, "HOH_bins", info.HOH_bins);
     parse(modules, "degree_distro", info.degree_distro);
+    parse(modules, "num_cell_blocks", info.num_cell_blocks);
     parse(modules, "density", info.density);
     parse(modules, "density_bins", info.density_bins);
     parse(modules, "heavy_water", info.heavy_water);
@@ -39,7 +44,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "time_step", info.time_step);
     parse(modules, "num_blocks", info.num_blocks);
     parse(modules, "write_unwrapped_xyz", info.write_unwrapped_xyz);
-    parse(modules, "orientation", info.orientation);
+    parse(modules, "orientation_2D", info.orientation);
     parse(modules, "orient_x_bins", info.orient_x_bins);
     parse(modules, "orient_y_bins", info.orient_y_bins);
     parse(modules, "orient_z_bins", info.orient_z_bins);
@@ -49,6 +54,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "sdf_z_start", info.sdf_start);
     parse(modules, "sdf_z_end", info.sdf_end);
     parse(modules, "sdf_bins", info.sdf_bins);
+    parse(modules, "network_reorganization_time", info.network_reorganization_time);
     
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);
@@ -63,7 +69,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(files, "y_density_output", info.ydens_output);
     parse(files, "z_density_output", info.zdens_output);
     parse(files, "mean_square_displacement_output", info.msd_filename);
-    parse(files, "orientation_output", info.orientation_filename);
+    parse(files, "orientation_2D_output", info.orientation_filename);
     parse(files, "H_group_trajectory", info.H_group_trajectory_filename);
     parse(files, "OH_group_trajectory", info.OH_group_trajectory_filename);
     parse(files, "unwrapped_coords", info.unwrapped_coords);

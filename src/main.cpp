@@ -19,7 +19,15 @@ TimeSteps time_steps;
 H_group_info hgi;
 
 void print_welcome_message() {
-    cout << "\n\t\tWelcome to --waternet--\n\n";
+    cout << "\n\n";
+    cout << " -------------------------------------------------------------------------------------\n";      
+    cout << "|   W         W        A    TTTTTTTTT  EEEEEEE   R R R   N      N  EEEEEEE  TTTTTTTTT |\n";
+    cout << "|  W           W      A A       T      E         R   R   N N    N  E            T     |\n";
+    cout << "|  W     W     W     A   A      T      E         R  R    N  N   N  E            T     |\n";
+    cout << "|   W   W W   W     AAAAAAA     T      EEEEEEE   R R     N   N  N  EEEEEEE      T     |\n";
+    cout << "|    W W   W W     A       A    T      E         R   R   N    N N  E            T     |\n";
+    cout << "|     W     W     A         A   T      EEEEEEE   R    R  N      N  EEEEEEE      T     |\n";
+    cout << " -------------------------------------------------------------------------------------\n\n";
 }
 
 int main() {

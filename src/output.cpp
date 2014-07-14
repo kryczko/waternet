@@ -34,7 +34,11 @@ bool output_graphfile(Information& info, TimeStep& time_step) {
     for (int i = 0; i < info.num_oxygen; i ++) {
         Oxygen& O = Ovec[i];
         vector<int>& bonds = O.bonded_O_neighbors;
-        output << "<node id=\"" << i << "\" label=\"" << (int) (O.z_coords / bin_size) << "\"/>\n";
+        if (O.z_coords < info.starting_z) {
+            output << "<node id=\"" << i << "\" label=\"" << (int) ((O.z_coords + info.lattice_z) / bin_size) << "\"/>\n";
+        } else {
+            output << "<node id=\"" << i << "\" label=\"" << (int) (O.z_coords / bin_size) << "\"/>\n";
+        }
     }
     int count = 0;
     output << "</nodes>\n" << "<edges>\n";
@@ -540,12 +544,13 @@ void unwrap(Information& info, TimeSteps& time_steps) {
 struct MsdStep {
     vector<double> msd_step;
     void declare(int len) {
-        for (int i = 0; i < len; i ++) {
-            msd_step.push_back(0);
-        }
+            msd_step.clear();
+            for (int i = 0; i < len; i ++) {
+                msd_step.push_back(0);
+            }
     }
 };
-
+    
 typedef std::vector<MsdStep> msd_vec;
 
 msd_vec msd_vector;
@@ -556,7 +561,7 @@ bool msd(Information& info, TimeSteps& time_steps) {
     for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
         double start_z = info.cell_block_start + cell*incr;
         double end_z = info.cell_block_start + (cell+1)*incr;
-        
+    
         msd_vector.resize(info.num_blocks);
         for (int i = 0; i < msd_vector.size(); i ++) {
             msd_vector[i].declare(time_steps.size());
@@ -568,6 +573,9 @@ bool msd(Information& info, TimeSteps& time_steps) {
         int length = time_steps.size() / info.num_blocks;
     
         vector<double> COMx, COMy, COMz;
+        COMx.resize(0);
+        COMy.resize(0);
+        COMz.resize(0);
     
     
         for (int len = 0; len < time_steps.size(); len ++) {
@@ -604,15 +612,22 @@ bool msd(Information& info, TimeSteps& time_steps) {
                 COMz.push_back(comz);
             }
         }
-        int starting_step = 0;
+        cout << "--- MSD progress ---\n";
+        int print_count = 0;
+        int starting_step, final_step;
         for (int nb = 0; nb < info.num_blocks; nb ++) {
-            int starting_step = nb*length;
-            int final_step = (nb + 1)*length;
+            starting_step = nb*length;
+            if (info.full_msd) {
+                final_step = time_steps.size();
+            } else {
+                final_step = (nb + 1)*length;
+            }
             O_vector& Ovec1 = time_steps[starting_step].O_atoms;
             H_vector& Hvec1 = time_steps[starting_step].H_atoms;
             vector<double>& msd_data = msd_vector[nb].msd_step;
             for (int len = starting_step; len < final_step; len ++) {
                 int step = len;
+                int ocounter = 0, hcounter = 0;
                 O_vector& Ovec = time_steps[step].O_atoms;
                 H_vector& Hvec = time_steps[step].H_atoms;
                 for (int j = 0; j < Ovec.size(); j ++) {
@@ -628,7 +643,7 @@ bool msd(Information& info, TimeSteps& time_steps) {
                         double dx = dx2 - dx1;
                         double dy = dy2 - dy1;
                         double dz = dz2 - dz1;
-            
+                        ocounter ++;
                         msd_data[step - starting_step] += dx*dx + dy*dy + dz*dz;
                     }
                 }
@@ -646,27 +661,43 @@ bool msd(Information& info, TimeSteps& time_steps) {
                         double dx = dx2 - dx1;
                         double dy = dy2 - dy1;
                         double dz = dz2 - dz1;
-                
+                        hcounter ++;
                         msd_data[step - starting_step] += dx*dx + dy*dy + dz*dz;
                     }
                 }
-                msd_data[step - starting_step] /= (double) (info.num_oxygen + info.num_hydrogen);
+                msd_data[step - starting_step] /= (double) (ocounter + hcounter) ;
             }
+            if ( nb < info.num_blocks) {
+                cout << "Cell block: " << cell + 1<<  " of " << info.num_cell_blocks << " --- |< " << (int) ( 100 * (double) nb / (double) info.num_blocks) << "% >| ---\r";
+                flush(cout);
+            } else if (nb == info.num_blocks - 1) {
+                cout << "Cell block: " << cell  + 1<<  " of " << info.num_cell_blocks << " --- |< 100% >| ---\n";
+                flush(cout);
+            }
+            
         }
-        vector<double> averaged_msd;
-        vector<int> counts;
-        for (int i = 0; i < length; i ++) {
-            averaged_msd.push_back(0);
-            counts.push_back(0);
+        cout << "Cell block: " << cell + 1<<  " of " << info.num_cell_blocks << " --- |< 100% >| ---\n\n";
+        vector<double> averaged_msd(0);
+        vector<int> counts(0);
+        if (info.full_msd) {
+            for (int i = 0; i < time_steps.size(); i ++) {
+                averaged_msd.push_back(0);
+                counts.push_back(0);
+            }
+        } else {
+            for (int i = 0; i < length; i ++) {
+                averaged_msd.push_back(0);
+                counts.push_back(0);
+            }
         }
         for (int i = 0; i < info.num_blocks; i ++) {
-            vector<double>& msd_data = msd_vector[i].msd_step;
-            for (int j = 0; j < msd_data.size(); j ++) {
-                averaged_msd[j] += msd_data[j];
-                if (msd_data[j] != 0) {
-                    counts[j] ++;
+                vector<double>& msd_data = msd_vector[i].msd_step;
+                for (int j = 0; j < msd_data.size(); j ++) {
+                    averaged_msd[j] += msd_data[j];
+                    if (msd_data[j] != 0) {
+                        counts[j] ++;
+                    }
                 }
-            }
         }
         averaged_msd[0] = 0;
         double slope_sum = 0;
@@ -681,12 +712,15 @@ bool msd(Information& info, TimeSteps& time_steps) {
             slope_sum += slope;
             slope_count ++;
         }
-        output << "# CALCULATED DIFFUSION COEFF for region " << cell << ": " << slope_sum / (1e8*6.0*slope_count) << " m^2 / s\n";
+        double dc = slope_sum / (1e8*6.0*slope_count), exp_dc = 2.30e-09;
+        output << "# Self diffusion coefficient for region " << cell << ": " << slope_sum / (1e8*6.0*slope_count) << " m^2 / s\n";
+        output << "# Experimental diffusion coefficient: 2.30e-09 m^2 /s, Percent difference: " <<  100.0 * abs(dc - exp_dc) / exp_dc << "%\n";
         output << "# Region: " << start_z << " to " << end_z << "[Angstroms] \n\n";
         for (int i = 1; i < averaged_msd.size() - 1; i ++) {
             output << i*info.time_step / 1000.0 << "\t" << averaged_msd[i] << "\n";
         }
         output.close();
+        msd_vector.clear();
     }
     return true;
 }
@@ -867,6 +901,10 @@ bool sdf(Information& info, TimeSteps& time_steps) {
     return true;
 }
 
+bool orientation_1D(Information& info, TimeSteps& time_steps) {
+    return true;
+}
+
 bool output_edgelist(Information& info, TimeSteps& time_steps) {
     ofstream output;
     output.open(info.edgelist_output_filename.c_str());
@@ -920,7 +958,11 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     } 
     if (info.orientation) {
         orientation(info, time_steps);
-        cout << "Outputted orientation data files.\n\n";
+        cout << "Outputted 2D orientation data files.\n\n";
+    }
+    if (info.orientation_1D) {
+        orientation_1D(info, time_steps);
+        cout << "Outputted 1D orientation data files.\n\n";
     }
     if (info.sdf) {
         sdf(info, time_steps);

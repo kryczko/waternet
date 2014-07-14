@@ -1,48 +1,49 @@
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 12.33
-    y: 12.81
-    z: 32.796
+    x: 14.41
+    y: 14.41
+    z: 28.82
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
-    O: 100
-    H: 200
+    O: 200
+    H: 400
 
 # perform which modules?
 modules:
     
+    create_edgelist: false    
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
-    num_cell_blocks: 10
-    cell_block_start: 15.0
-    cell_block_end: 35.0
+    num_cell_blocks: 2
+    cell_block_start: 0
+    cell_block_end: 28.82
     
     # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
     fix_plots: true
     starting_z: 5.0
     
     # create a graph xml file 
-    output_gephi: true
+    output_gephi: false
     
     # create a data file to plot the degree along the z-axis
-    degree_z: true
+    degree_z: false
     degree_bins: 500
     
     # create a data file to plot neighboring O-O distance distribution
-    OOdistro: true
+    OOdistro: false
     OO_bins: 1000
     OO_max_dist: 5.0
     
     # create a data file to plot local O-H distance distribution
-    OHdistro: true
+    OHdistro: false
     OH_bins: 1000
     OH_max_dist: 2.0
     
     # create a data file to plot local H-O-H angle distribution
-    HOHdistro: true
+    HOHdistro: false
     HOH_bins: 1000
     
     # create a data file for the cumulative degree distribution (coordination number)
-    degree_distro: true
+    degree_distro: false
     
     # create data files for each coordinate (x, y, and z) with density profiles
     density: true
@@ -51,12 +52,15 @@ modules:
         
     # create data file for mean square displacement
     mean_square_displacement: true
-    time_step: 0.27  # in femtoseconds
-    num_blocks: 500 # number of starting configurations
+    time_step: 0.1935  # in femtoseconds
+    num_blocks: 100 # number of starting configurations
+    # if false, the msd will be calculated for a short period of time = num_timesteps / num_blocks
+    # if true, the msd will be calculated as normal for the full trajectory
+    full_msd: true
     write_unwrapped_xyz: false # write out the unwrapped coordinates
     
     # create data files for contour plots of water molecule orientations
-    orientation_2D: true
+    orientation_2D: false
     orient_x_bins: 20
     orient_y_bins: 20
     orient_z_bins: 20
@@ -83,7 +87,7 @@ modules:
 filenames:
     
     #### MOST IMPORTANT PARAM #### 
-    input: xyzfiles/100_PBE_4lay.xyz
+    input: xyzfiles/duplicated.xyz
     edgelist_output: output/edges.dat
     gephi_output: output/Hbond_graph.gexf
     degree_z_output: output/degree_z.dat

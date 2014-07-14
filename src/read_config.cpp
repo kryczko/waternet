@@ -19,6 +19,7 @@ static inline void parse(const Node& node, const char* key, T& value, bool optio
 
 void parse_inputfile(Information& info, const Node& node) {
     const Node& modules = node["modules"];
+    parse(modules, "create_edgelist", info.create_edgelist);
     parse(modules, "num_cell_blocks", info.num_cell_blocks);
     parse(modules, "cell_block_start", info.cell_block_start);
     parse(modules, "cell_block_end", info.cell_block_end);
@@ -43,6 +44,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "mean_square_displacement", info.msd);
     parse(modules, "time_step", info.time_step);
     parse(modules, "num_blocks", info.num_blocks);
+    parse(modules, "full_msd", info.full_msd);
     parse(modules, "write_unwrapped_xyz", info.write_unwrapped_xyz);
     parse(modules, "orientation_2D", info.orientation);
     parse(modules, "orient_x_bins", info.orient_x_bins);
@@ -55,6 +57,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "sdf_z_end", info.sdf_end);
     parse(modules, "sdf_bins", info.sdf_bins);
     parse(modules, "network_reorganization_time", info.network_reorganization_time);
+    parse(modules, "orientation_1D", info.orientation_1D);
     
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);

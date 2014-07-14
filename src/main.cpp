@@ -20,14 +20,17 @@ H_group_info hgi;
 
 void print_welcome_message() {
     cout << "\n\n";
-    cout << " -------------------------------------------------------------------------------------\n";      
-    cout << "|   W         W        A    TTTTTTTTT  EEEEEEE   R R R   N      N  EEEEEEE  TTTTTTTTT |\n";
-    cout << "|  W           W      A A       T      E         R   R   N N    N  E            T     |\n";
-    cout << "|  W     W     W     A   A      T      E         R  R    N  N   N  E            T     |\n";
-    cout << "|   W   W W   W     AAAAAAA     T      EEEEEEE   R R     N   N  N  EEEEEEE      T     |\n";
-    cout << "|    W W   W W     A       A    T      E         R   R   N    N N  E            T     |\n";
-    cout << "|     W     W     A         A   T      EEEEEEE   R    R  N      N  EEEEEEE      T     |\n";
-    cout << " -------------------------------------------------------------------------------------\n\n";
+    cout << " ------------------------------------------------------------------------\n";      
+    cout << "|  W         W    A  TTTTTTTTT EEEEEEE R R R  N      N EEEEEEE TTTTTTTTT |\n";
+    cout << "| W           W  A A     T     E       R   R  N N    N E           T     |\n";
+    cout << "| W     W     W A   A    T     E       R  R   N  N   N E           T     |\n";
+    cout << "|  W   W W   W AAAAAAA   T     EEEEEEE R R    N   N  N EEEEEEE     T     |\n";
+    cout << "|   W W   W W A       A  T     E       R   R  N    N N E           T     |\n";
+    cout << "|    W     W A         A T     EEEEEEE R    R N      N EEEEEEE     T     |\n";
+    cout << " ------------------------------------------------------------------------\n\n";
+    cout << "              WRITTEN BY K. RYCZKO, WITH HELP FROM I. TAMBLYN              \n";
+    cout << "               UNIVERSITY OF ONTARIO INSTITUTE OF TECHNOLOGY               \n";
+    cout << "            COMPUTATIONAL LABORATORY FOR ENERGY AND NANOSCIENCE            \n\n\n";
 }
 
 int main() {
@@ -41,8 +44,7 @@ int main() {
         return 0;
     }
     if (!create_edgelist(info, time_steps)) {
-        cout << "Error creating edgelists, exiting...\n\n";
-        return 0;
+        cout << "Error creating edgelists, some modules will fail...\n\n";
     }
     if (!output_edgelist(info, time_steps)) {
         cout << "Error outputting edgelists, exiting...\n\n";

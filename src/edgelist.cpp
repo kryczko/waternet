@@ -118,6 +118,10 @@ void check_final_bonds(Oxygen& O, O_vector& Ovec, H_vector& Hvec, Information& i
 }
 
 bool create_edgelist(Information& info, TimeSteps& time_steps) {
+    if (!info.create_edgelist) {
+        return false;
+    }
+    cout << "--- Edgelist progress ---\n";
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
@@ -137,8 +141,15 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
             Oxygen& O = Ovec[j];
             check_final_bonds(O, Ovec, Hvec, info);
         }
-        
+        if (i < time_steps.size()) {
+            cout << "--- |< " << (int) ( 100 * (double) i / (double) time_steps.size()) << "% >| ---\r";
+            flush(cout);
+        } else if (i == time_steps.size() - 1) {
+            cout << "--- |< 100 % >| ---\n";
+            flush(cout);
+        }    
     }
+    cout << "--- |< 100 % >| ---\n\n";
     cout << "Computed nearest neighbour lists...\n\n";
     return true;
 }

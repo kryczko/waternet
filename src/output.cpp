@@ -725,6 +725,69 @@ bool msd(Information& info, TimeSteps& time_steps) {
     return true;
 }
 
+bool orientation_1D(Information& info, TimeSteps& time_steps) {
+    double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
+    for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
+        double start_z = info.cell_block_start + cell*incr;
+        double end_z = info.cell_block_start + (cell+1)*incr;
+        
+        vector<double> posx, posy, posz, vecx, vecy, vecz;
+        for (int i = 0; i < time_steps.size(); i ++) {
+            O_vector& Ovec = time_steps[i].O_atoms;
+            H_vector& Hvec = time_steps[i].H_atoms;
+            for (int j = 0; j < Ovec.size(); j++) {
+                Oxygen& O = Ovec[j];
+                if (O.local_H_neighbors.size() == 2 && O.z_coords > start_z && O.z_coords < end_z) {
+                    Hydrogen& H1 = Hvec[O.local_H_neighbors[0]];    
+                    Hydrogen& H2 = Hvec[O.local_H_neighbors[1]];
+                    double ohx1 = H1.x_coords - O.x_coords;
+                    double ohy1 = H1.y_coords - O.y_coords;
+                    double ohz1 = H1.z_coords - O.z_coords;
+                    double ohx2 = H2.x_coords - O.x_coords;
+                    double ohy2 = H2.y_coords - O.y_coords;
+                    double ohz2 = H2.z_coords - O.z_coords;
+                    ohx1 -= info.lattice_x * pbc_round(ohx1/info.lattice_x);
+                    ohy1 -= info.lattice_y * pbc_round(ohy1/info.lattice_y);
+                    ohz1 -= info.lattice_z * pbc_round(ohz1/info.lattice_z);
+                    ohx2 -= info.lattice_x * pbc_round(ohx2/info.lattice_x);
+                    ohy2 -= info.lattice_y * pbc_round(ohy2/info.lattice_y);
+                    ohz2 -= info.lattice_z * pbc_round(ohz2/info.lattice_z);
+                    vecx.push_back(ohx1 + ohx2);
+                    vecy.push_back(ohy1 + ohy2);
+                    vecz.push_back(ohz1 + ohz2);
+                    posx.push_back(wrap(O.x_coords + (ohx1 + ohx2) / 2, info.lattice_x));
+                    posy.push_back(wrap(O.y_coords + (ohy1 + ohy2) / 2, info.lattice_y));
+                    posz.push_back(wrap(O.z_coords + (ohz1 + ohz2) / 2, info.lattice_z));
+                }
+            }
+        }
+        int angle_bin[180] = {};
+        double count = 0;
+        for (int i = 0; i < vecx.size(); i ++) {
+            double dot = vecz[i];
+            double norm = sqrt( vecx[i]*vecx[i] + vecy[i]*vecy[i] + vecz[i]*vecz[i] );
+            double angle = acos ( dot / ( norm ) ) * rtd;
+        
+            //if (vecx[i] < 0 || vecy[i] < 0) {
+              //  angle += 180.0;
+            //}
+            angle_bin[(int) angle] ++;
+            count ++;
+        
+        }
+        ofstream output;
+        string filename = "output/orientation_1D_region_" + to_string(cell) + ".dat";
+        output.open(filename.c_str());
+        output << "# 1D orientation for region " << cell << "\n";
+        output << "# Region is from " << start_z << " to " << end_z << "\n\n";
+        for (int i = 0 ; i < 180; i ++) {
+            output << cos((double) i / rtd) << "   " << angle_bin[i] / count << "\n";
+        }
+        output.close();
+    }
+        return true;
+}
+
 bool orientation(Information& info, TimeSteps& time_steps) {
     vector<double> posx, posy, posz, vecx, vecy, vecz;
     for (int i = 0; i < time_steps.size(); i ++) {
@@ -847,6 +910,7 @@ bool orientation(Information& info, TimeSteps& time_steps) {
             
         }
     }
+    
     outputxz.close();
     outputyz.close();
     outputxz.close();
@@ -894,14 +958,57 @@ bool sdf(Information& info, TimeSteps& time_steps) {
         for (int j = 0; j < info.sdf_bins; j ++) {
             O_output << i*xinc << "  " << j*yinc << "  " << "  " <<  100.0 * Obins[i][j] / (double) O_count << "\n";
             H_output << i*xinc << "  " << j*yinc << "  " << "  " <<  100.0 * Hbins[i][j] / (double) H_count << "\n";
+
         }
     }
+
     O_output.close();
     H_output.close();
     return true;
 }
 
-bool orientation_1D(Information& info, TimeSteps& time_steps) {
+int max(vector<int> vec) {
+    int max = 0;
+    for (int i = 0; i < vec.size(); i ++) {
+        if (vec[i] > max) {
+            max = vec[i];
+        }
+    }
+    return max;
+}
+
+bool nrt(Information& info, TimeSteps& time_steps) {
+    vector<int> timesteps, oxygens;
+    for (int i = 1; i < time_steps.size() - 1; i ++) {
+        O_vector& Ovec_now = time_steps[i].O_atoms, Ovec_then = time_steps[i-1].O_atoms;
+        for (int j = 0; j < Ovec_now.size(); j ++) {
+            Oxygen& O_now = Ovec_now[j], O_then = Ovec_then[j];
+            if (O_now.nearest_neighbors != O_then.nearest_neighbors) {
+                timesteps.push_back(i);
+                oxygens.push_back(j);
+            }
+        }
+    }
+    
+    // remove all duplicates
+    // duplicates come from molecules switching partners in one timestep, or multiple switches
+    timesteps.erase( unique( timesteps.begin(), timesteps.end() ), timesteps.end() );
+    ofstream output;
+    output.open(info.nrt_output.c_str());
+    vector<int> time_diffs(timesteps.size() - 1);
+    for (int i = 1; i < timesteps.size() - 1; i ++ ) {
+        time_diffs[i - 1] = timesteps[i] - timesteps[i - 1];
+    }
+    int max_time_diff = max(time_diffs);
+    vector<int> distro(max_time_diff);
+    for (int i = 0; i < time_diffs.size(); i ++) {
+        distro[time_diffs[i]] ++;
+    }
+    for (int i = 0; i < distro.size(); i ++) {
+        output << i*info.time_step << "   " << distro[i] / (double) time_diffs.size() << "\n";
+        output << (i+1)*info.time_step << "   " << distro[i] / (double) time_diffs.size() << "\n";
+     }
+    output.close();
     return true;
 }
 
@@ -967,6 +1074,10 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     if (info.sdf) {
         sdf(info, time_steps);
         cout << "Outputted spacial distribution function data files.\n\n";
+    }
+    if (info.network_reorganization_time) {
+        nrt(info, time_steps);
+        cout << "Outputted network reorganization time data file.\n\n";
     }
     return true;
 }

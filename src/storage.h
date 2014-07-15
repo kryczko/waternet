@@ -19,12 +19,12 @@ struct Information {
     bool sdf, network_reorganization_time, orientation_1D, full_msd;
     double sdf_start, sdf_end, starting_z;
     int sdf_bins, num_cell_blocks;
-    std::string sdf_output;
+    std::string sdf_output, nrt_output;
     
     Information() {
         // declare incorrect values, so we need to read things in to obtain information
         edgelist_output_filename = input_filename = in_degree = out_degree = cumulative_degree = gephi_output = degree_z_output = unwrapped_coords = "not_a_file";
-        OO_output = OH_output = HOH_output = degree_output = xdens_output = ydens_output = zdens_output = msd_filename = orientation_filename = sdf_output = "notafile";
+        OO_output = OH_output = HOH_output = degree_output = xdens_output = ydens_output = zdens_output = msd_filename = orientation_filename = sdf_output = nrt_output = "notafile";
         n_frames = num_oxygen = num_hydrogen = sdf_bins = -1;
         H_group_dynamics = OH_group_dynamics = write_unwrapped_xyz = sdf = network_reorganization_time = orientation_1D = create_edgelist = false;
         lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = cell_block_start = cell_block_end = -1.0; 

@@ -1,58 +1,59 @@
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 14.41
-    y: 14.41
-    z: 28.82
+    x: 12.33
+    y: 12.81
+    z: 23.795
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
-    O: 200
-    H: 400
+    O: 100
+    H: 200
 
 # perform which modules?
 modules:
     
-    create_edgelist: false    
+    # this module creates a neighbor list for the water molecules from the xyz file, it is needed for most other modules. 
+    create_edgelist: true    
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
-    num_cell_blocks: 2
-    cell_block_start: 0
-    cell_block_end: 28.82
+    num_cell_blocks: 5
+    cell_block_start: 3.35
+    cell_block_end: 24.0
     
     # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
     fix_plots: true
     starting_z: 5.0
     
     # create a graph xml file 
-    output_gephi: false
+    output_gephi: true
     
     # create a data file to plot the degree along the z-axis
-    degree_z: false
+    degree_z: true
     degree_bins: 500
     
     # create a data file to plot neighboring O-O distance distribution
-    OOdistro: false
+    OOdistro: true
     OO_bins: 1000
     OO_max_dist: 5.0
     
     # create a data file to plot local O-H distance distribution
-    OHdistro: false
+    OHdistro: true
     OH_bins: 1000
     OH_max_dist: 2.0
     
     # create a data file to plot local H-O-H angle distribution
-    HOHdistro: false
+    HOHdistro: true
     HOH_bins: 1000
     
     # create a data file for the cumulative degree distribution (coordination number)
-    degree_distro: false
+    degree_distro: true
     
     # create data files for each coordinate (x, y, and z) with density profiles
     density: true
     density_bins: 500
-    heavy_water: false
+    heavy_water: true
         
     # create data file for mean square displacement
-    mean_square_displacement: true
-    time_step: 0.1935  # in femtoseconds
+    mean_square_displacement: false
+    time_step: 0.2737  # in femtoseconds - 0.1935 H2O - 0.2737 D2O -
     num_blocks: 100 # number of starting configurations
     # if false, the msd will be calculated for a short period of time = num_timesteps / num_blocks
     # if true, the msd will be calculated as normal for the full trajectory
@@ -86,8 +87,13 @@ modules:
 # enter the file name you would like to perform analysis on
 filenames:
     
-    #### MOST IMPORTANT PARAM #### 
-    input: xyzfiles/duplicated.xyz
+    ######## YOUR INPUT XYZ FILE ############
+    #                                       #
+    input: xyzfiles/graphene_water.xyz      #
+    #                                       #   
+    #########################################
+    
+    ####### OUTPUT FILENAMES ########
     edgelist_output: output/edges.dat
     gephi_output: output/Hbond_graph.gexf
     degree_z_output: output/degree_z.dat
@@ -104,3 +110,4 @@ filenames:
     OH_group_trajectory: output/OH_group_trajectory.xyz
     unwrapped_coords: output/unwrapped_coords.xyz
     spacial_distribution_output: output/sdf_ # the rest of the filename corresponds to the atomtype
+    network_reorganization_time_distro_output: output/nrt_distro.dat

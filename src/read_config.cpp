@@ -77,6 +77,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(files, "OH_group_trajectory", info.OH_group_trajectory_filename);
     parse(files, "unwrapped_coords", info.unwrapped_coords);
     parse(files, "spacial_distribution_output", info.sdf_output);
+    parse(files, "network_reorganization_time_distro_output", info.nrt_output);
     
     const Node& lattice_consts = node["lattice_constants"];
     parse(lattice_consts, "x", info.lattice_x);

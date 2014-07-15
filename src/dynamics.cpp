@@ -18,13 +18,14 @@ double average(vector<int>& myvec) {
 
 bool H_group_dynamics(Information& info, TimeSteps& time_steps, H_group_info& hgi) {
     ofstream trajectory;
+    int H_group_count = 0;
     trajectory.open(info.H_group_trajectory_filename.c_str());
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
             if (Ovec[j].local_H_neighbors.size() == 3) {
-                
+                H_group_count ++;
                 if ( hgi.last_oxygen == -1 ) {
                     hgi.last_oxygen = j; 
                     hgi.last_timestep = i;
@@ -46,24 +47,37 @@ bool H_group_dynamics(Information& info, TimeSteps& time_steps, H_group_info& hg
                 trajectory << "H" << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].x_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].y_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].z_coords << "\n";
                 trajectory << "H" << "\t" << Hvec[Ovec[j].local_H_neighbors[1]].x_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[1]].y_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[1]].z_coords << "\n";
                 trajectory << "H" << "\t" << Hvec[Ovec[j].local_H_neighbors[2]].x_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[2]].y_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[2]].z_coords << "\n";
+                break;
             } 
         }
     }
-    ofstream test;
-    test.open("test_time.dat");
-    for (int i = 0; i < hgi.Os.size(); i ++) {
-        test << hgi.Os[i] << "\t" << hgi.counts[i] << "\n";
-    }
     
-    cout << "AVERAGE H-GROUP LIFETIME = " << average(hgi.counts) << "\n\n";
-    test.close();
+    cout << "AVERAGE H-GROUP LIFETIME = " << average(hgi.counts) << "\n";
+    cout << "Fraction of frames where a H3O ion was found: " << (double) H_group_count / info.n_frames << "\n\n";
     trajectory.close();
     return true;
 }
 
 bool OH_group_dynamics(Information& info, TimeSteps& time_steps) {
-    
-    
+    ofstream trajectory;
+    int OH_group_count = 0;
+    trajectory.open(info.OH_group_trajectory_filename.c_str());
+    for (int i = 0; i < time_steps.size(); i ++) {
+        O_vector& Ovec = time_steps[i].O_atoms;
+        H_vector& Hvec = time_steps[i].H_atoms;
+        for (int j = 0; j < Ovec.size(); j ++) {
+            if (Ovec[j].local_H_neighbors.size() == 1) {
+                OH_group_count ++;
+                
+                trajectory << 2 << "\n\n";
+                trajectory << "O" << "\t" << Ovec[j].x_coords << "\t" << Ovec[j].y_coords << "\t" << Ovec[j].z_coords << "\n";
+                trajectory << "H" << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].x_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].y_coords << "\t" << Hvec[Ovec[j].local_H_neighbors[0]].z_coords << "\n";    
+                break;
+            }
+        }
+    }
+    cout << "Fraction of frames where a OH ion was found: " << (double) OH_group_count / info.n_frames << "\n\n";
+    trajectory.close();
     return true;
 }
 
@@ -72,7 +86,7 @@ bool main_dynamics_func(Information& info, TimeSteps& time_steps, H_group_info& 
         H_group_dynamics(info, time_steps, hgi);
         cout << "H-group dynamic calculations have been done.\n\n";
     }
-    else if (info.OH_group_dynamics) {
+    if (info.OH_group_dynamics) {
         OH_group_dynamics(info, time_steps);
         cout << "OH-group dynamic calculations have been done.\n\n";
     }

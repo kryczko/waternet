@@ -996,9 +996,13 @@ bool nrt(Information& info, TimeSteps& time_steps) {
     ofstream output;
     output.open(info.nrt_output.c_str());
     vector<int> time_diffs(timesteps.size() - 1);
+    double time_diff_sum = 0;
     for (int i = 1; i < timesteps.size() - 1; i ++ ) {
         time_diffs[i - 1] = timesteps[i] - timesteps[i - 1];
+        time_diff_sum += time_diffs[i-1];
     }
+    double average = time_diff_sum / time_diffs.size();
+    output << "# The average time between H-bond reorganizations: " << average*info.time_step << " fs.\n\n";
     int max_time_diff = max(time_diffs);
     vector<int> distro(max_time_diff);
     for (int i = 0; i < time_diffs.size(); i ++) {
@@ -1013,22 +1017,23 @@ bool nrt(Information& info, TimeSteps& time_steps) {
 }
 
 bool output_edgelist(Information& info, TimeSteps& time_steps) {
-    ofstream output;
-    output.open(info.edgelist_output_filename.c_str());
+    if (info.create_edgelist) {
+        ofstream output;
+        output.open(info.edgelist_output_filename.c_str());
     
-    for (int i = 0; i < time_steps.size(); i ++) {
-        O_vector& Ovec = time_steps[i].O_atoms;
-        H_vector& Hvec = time_steps[i].H_atoms;
-        output << "Frame:\t" << i << "\t" << num_edges(Ovec) << "\n";
-        for (int j = 0; j < Ovec.size(); j ++) {
-            for (int k = 0; k < Ovec[j].bonded_O_neighbors.size(); k ++) {
-                output << Ovec[j].ID << "\t" << Ovec[j].bonded_O_neighbors[k] << "\n";
+        for (int i = 0; i < time_steps.size(); i ++) {
+            O_vector& Ovec = time_steps[i].O_atoms;
+            H_vector& Hvec = time_steps[i].H_atoms;
+            output << "Frame:\t" << i << "\t" << num_edges(Ovec) << "\n";
+            for (int j = 0; j < Ovec.size(); j ++) {
+                for (int k = 0; k < Ovec[j].bonded_O_neighbors.size(); k ++) {
+                    output << Ovec[j].ID << "\t" << Ovec[j].bonded_O_neighbors[k] << "\n";
+                }
             }
         }
+        cout << "Outputted edge list to data file given.\n\n";
+        output.close();
     }
-    cout << "Outputted edge list to data file given.\n\n";
-    output.close();
-    
     out_count(info, time_steps);
     
     if (info.output_gephi) {

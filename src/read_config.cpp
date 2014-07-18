@@ -58,6 +58,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "sdf_bins", info.sdf_bins);
     parse(modules, "network_reorganization_time", info.network_reorganization_time);
     parse(modules, "orientation_1D", info.orientation_1D);
+    parse(modules, "time_length", info.time_length);
     
     const Node& files = node["filenames"];
     parse(files, "input", info.input_filename);

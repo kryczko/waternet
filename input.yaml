@@ -82,7 +82,10 @@ modules:
     sdf_bins: 20 # number of bins for atom binning
     
     # run analysis that calculates the time between water molecules switch partners
+    # the plot outputted is the probability after some time (in ps) that you would
+    # find a water molecule with the same partner
     network_reorganization_time: true
+    time_length: 10000 # in timesteps, the function will average over this
     
 # enter the file name you would like to perform analysis on
 filenames:

@@ -977,42 +977,60 @@ int max(vector<int> vec) {
     return max;
 }
 
+vector<int> set_zero(vector<int>& vec) {
+    for (int i = 0; i < vec.size(); i ++) {
+        vec[i] = 0;
+    }
+    return vec;
+}
+
+struct O_Helper {
+    vector<int> all_neighbors;
+    vector<int> starting_times;
+};
+typedef std::vector<O_Helper> Ohelp;
+
 bool nrt(Information& info, TimeSteps& time_steps) {
-    vector<int> timesteps, oxygens;
-    for (int i = 1; i < time_steps.size() - 1; i ++) {
-        O_vector& Ovec_now = time_steps[i].O_atoms, Ovec_then = time_steps[i-1].O_atoms;
-        for (int j = 0; j < Ovec_now.size(); j ++) {
-            Oxygen& O_now = Ovec_now[j], O_then = Ovec_then[j];
-            if (O_now.nearest_neighbors != O_then.nearest_neighbors) {
-                timesteps.push_back(i);
-                oxygens.push_back(j);
+    Ohelp O_helper;
+    vector<int> time_counter(info.time_length - 1);
+    vector<int> time_counts = set_zero(time_counter);
+    O_helper.resize(info.num_oxygen);    
+    for (int i = 0; i < time_steps.size(); i ++) {
+        O_vector& Ovec = time_steps[i].O_atoms;
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
+            for (int k = 0; k < O.nearest_neighbors.size(); k ++) {
+                int O_neighbor = O.nearest_neighbors[k];
+                    if (find(O_helper[j].all_neighbors.begin(), O_helper[j].all_neighbors.end(), O_neighbor) == O_helper[j].all_neighbors.end()) {
+                        O_helper[j].all_neighbors.push_back(O_neighbor);
+                        O_helper[j].starting_times.push_back(i);
+                    }
+                }
+            }
+    }   
+    
+    ofstream output;
+    output.open(info.nrt_output.c_str());
+    double counter = 0;
+    for (int i = 0; i < O_helper.size(); i ++) {
+        for (int j = 0; j < O_helper[i].all_neighbors.size(); j ++) {
+            int times = O_helper[i].starting_times[j];
+            int O_neighbor = O_helper[i].all_neighbors[j];
+            counter ++;
+            int final_time = info.time_length;
+            (times + final_time) > info.n_frames ? final_time = info.n_frames - times : final_time = info.time_length + times;
+                
+            for (int k = times + 1; k < final_time; k ++ ) {
+                O_vector& Ovec = time_steps[k].O_atoms;
+                if (find(Ovec[i].nearest_neighbors.begin(), Ovec[i].nearest_neighbors.end(), O_neighbor) != Ovec[i].nearest_neighbors.end())
+                    time_counts[k - 1 - times] ++;
             }
         }
     }
+    for (int i = 0; i < time_counts.size(); i ++) {
+        output << i*info.time_step / 1000.0 << "\t" << 100 * time_counts[i] / counter << "\n";
+    }
     
-    // remove all duplicates
-    // duplicates come from molecules switching partners in one timestep, or multiple switches
-    timesteps.erase( unique( timesteps.begin(), timesteps.end() ), timesteps.end() );
-    ofstream output;
-    output.open(info.nrt_output.c_str());
-    vector<int> time_diffs(timesteps.size() - 1);
-    double time_diff_sum = 0;
-    for (int i = 1; i < timesteps.size() - 1; i ++ ) {
-        time_diffs[i - 1] = timesteps[i] - timesteps[i - 1];
-        time_diff_sum += time_diffs[i-1];
-    }
-    double average = time_diff_sum / time_diffs.size();
-    output << "# The average time between H-bond reorganizations: " << average*info.time_step << " fs.\n\n";
-    int max_time_diff = max(time_diffs);
-    vector<int> distro(max_time_diff);
-    for (int i = 0; i < time_diffs.size(); i ++) {
-        distro[time_diffs[i]] ++;
-    }
-    for (int i = 0; i < distro.size(); i ++) {
-        output << i*info.time_step << "   " << distro[i] / (double) time_diffs.size() << "\n";
-        output << (i+1)*info.time_step << "   " << distro[i] / (double) time_diffs.size() << "\n";
-     }
-    output.close();
     return true;
 }
 

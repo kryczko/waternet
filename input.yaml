@@ -1,8 +1,8 @@
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 12.33
-    y: 12.81
-    z: 23.795
+    x: 14.41
+    y: 14.41
+    z: 14.41
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
     O: 100
@@ -53,7 +53,7 @@ modules:
         
     # create data file for mean square displacement
     mean_square_displacement: false
-    time_step: 0.2737  # in femtoseconds - 0.1935 H2O - 0.2737 D2O -
+    time_step: 0.1935  # in femtoseconds - 0.1935 H2O - 0.2737 D2O -
     num_blocks: 100 # number of starting configurations
     # if false, the msd will be calculated for a short period of time = num_timesteps / num_blocks
     # if true, the msd will be calculated as normal for the full trajectory
@@ -85,14 +85,14 @@ modules:
     # the plot outputted is the probability after some time (in ps) that you would
     # find a water molecule with the same partner
     network_reorganization_time: true
-    time_length: 10000 # in timesteps, the function will average over this
+    time_length: 5168 # in timesteps, the function will average over this
     
 # enter the file name you would like to perform analysis on
 filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/graphene_water.xyz      #
+    input: xyzfiles/100_PBE_pure.xyz      #
     #                                       #   
     #########################################
     

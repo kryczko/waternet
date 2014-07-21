@@ -992,7 +992,13 @@ typedef std::vector<O_Helper> Ohelp;
 
 bool nrt(Information& info, TimeSteps& time_steps) {
     Ohelp O_helper;
-    vector<int> time_counter(info.time_length - 1);
+    vector<int> time_counter;
+    
+    int vector_size = info.time_length;
+    if (info.time_length > info.n_frames) {
+        vector_size = (int) info.n_frames;
+    } 
+    time_counter.resize(vector_size - 1);
     vector<int> time_counts = set_zero(time_counter);
     O_helper.resize(info.num_oxygen);    
     for (int i = 0; i < time_steps.size(); i ++) {
@@ -1008,22 +1014,25 @@ bool nrt(Information& info, TimeSteps& time_steps) {
                 }
             }
     }   
-    
     ofstream output;
-    output.open(info.nrt_output.c_str());
     double counter = 0;
+    output.open(info.nrt_output.c_str());
     for (int i = 0; i < O_helper.size(); i ++) {
         for (int j = 0; j < O_helper[i].all_neighbors.size(); j ++) {
+            int count = 0;
             int times = O_helper[i].starting_times[j];
             int O_neighbor = O_helper[i].all_neighbors[j];
+            int final_time = info.time_length + times;
             counter ++;
-            int final_time = info.time_length;
-            (times + final_time) > info.n_frames ? final_time = info.n_frames - times : final_time = info.time_length + times;
-                
+            if ((final_time) > info.n_frames) {
+                final_time = info.n_frames;
+            }
             for (int k = times + 1; k < final_time; k ++ ) {
                 O_vector& Ovec = time_steps[k].O_atoms;
-                if (find(Ovec[i].nearest_neighbors.begin(), Ovec[i].nearest_neighbors.end(), O_neighbor) != Ovec[i].nearest_neighbors.end())
-                    time_counts[k - 1 - times] ++;
+                if (find(Ovec[i].nearest_neighbors.begin(), Ovec[i].nearest_neighbors.end(), O_neighbor) != Ovec[i].nearest_neighbors.end()) {
+                    time_counts[k - 1 - times] ++;       
+                    count ++;         
+                }
             }
         }
     }

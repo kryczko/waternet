@@ -9,3 +9,11 @@ test2:
 test3:
 
 	this tests the orientation code, and shows why we only have 0 - 180 degrees in the contour plots
+
+test4:
+
+    tests the network reorganization time function, should get a step function from 100-0 half way      through the plot (set pbcs to {20 20 20}, and time_length in nrt function to > 20)
+
+test4_p2:
+    
+    another test for the network reorganization time function, should get oscillating 100's and 0's     if time_length > 25, or 0, 100, 0 if time_length = 4. set pbcs to {20 20 20} 

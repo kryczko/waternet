@@ -142,7 +142,7 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
             check_final_bonds(O, Ovec, Hvec, info);
         }
         if (i < time_steps.size()) {
-            cout << "--- |< " << (int) ( 100 * (double) i / (double) time_steps.size()) << "% >| ---\r";
+            cout << "--- |< " << (int) ( 100 * (double) i / (double) time_steps.size()) << " % >| ---\r";
             flush(cout);
         } else if (i == time_steps.size() - 1) {
             cout << "--- |< 100 % >| ---\n";

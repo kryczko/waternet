@@ -984,60 +984,60 @@ vector<int> set_zero(vector<int>& vec) {
     return vec;
 }
 
-struct O_Helper {
-    vector<int> all_neighbors;
-    vector<int> starting_times;
-};
-typedef std::vector<O_Helper> Ohelp;
-
 bool nrt(Information& info, TimeSteps& time_steps) {
-    Ohelp O_helper;
     vector<int> time_counter;
     
     int vector_size = info.time_length;
     if (info.time_length > info.n_frames) {
         vector_size = (int) info.n_frames;
     } 
+    double normalizer = 0;
     time_counter.resize(vector_size - 1);
     vector<int> time_counts = set_zero(time_counter);
-    O_helper.resize(info.num_oxygen);    
-    for (int i = 0; i < time_steps.size(); i ++) {
-        O_vector& Ovec = time_steps[i].O_atoms;
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            for (int k = 0; k < O.nearest_neighbors.size(); k ++) {
-                int O_neighbor = O.nearest_neighbors[k];
-                    if (find(O_helper[j].all_neighbors.begin(), O_helper[j].all_neighbors.end(), O_neighbor) == O_helper[j].all_neighbors.end()) {
-                        O_helper[j].all_neighbors.push_back(O_neighbor);
-                        O_helper[j].starting_times.push_back(i);
+    cout << "--- Network reorganization time progress ---\n";
+    int length = time_steps.size() / info.num_starts;
+    
+    for (int average_step = 0; average_step < time_steps.size(); average_step += length) {
+        int start = average_step + 1;
+        int stop = info.time_length + average_step + 1;
+        if (stop > time_steps.size()) {
+            stop = time_steps.size();
+        }
+        O_vector& Ovec_before = time_steps[average_step].O_atoms;
+        for (int i = 0; i < Ovec_before.size();  i++) {
+            normalizer += Ovec_before[i].nearest_neighbors.size();
+        }
+        for (int step = start; step < stop - 1; step ++) {
+            O_vector& Ovec_after = time_steps[step].O_atoms;
+            for (int atom = 0; atom < Ovec_before.size(); atom ++) {
+                Oxygen& O_before = Ovec_before[atom];
+                Oxygen& O_after = Ovec_after[atom];
+                for (int n = 0; n < O_before.nearest_neighbors.size(); n ++) {
+                    int neighbor_before = O_before.nearest_neighbors[n];
+                    for (int m = 0; m < O_after.nearest_neighbors.size(); m ++) {
+                        int neighbor_after = O_after.nearest_neighbors[m];
+                        if (neighbor_before == neighbor_after) {
+                            time_counts[step - start] ++;
+                        }
                     }
                 }
             }
-    }   
-    ofstream output;
-    double counter = 0;
-    output.open(info.nrt_output.c_str());
-    for (int i = 0; i < O_helper.size(); i ++) {
-        for (int j = 0; j < O_helper[i].all_neighbors.size(); j ++) {
-            int count = 0;
-            int times = O_helper[i].starting_times[j];
-            int O_neighbor = O_helper[i].all_neighbors[j];
-            int final_time = info.time_length + times;
-            counter ++;
-            if ((final_time) > info.n_frames) {
-                final_time = info.n_frames;
-            }
-            for (int k = times + 1; k < final_time; k ++ ) {
-                O_vector& Ovec = time_steps[k].O_atoms;
-                if (find(Ovec[i].nearest_neighbors.begin(), Ovec[i].nearest_neighbors.end(), O_neighbor) != Ovec[i].nearest_neighbors.end()) {
-                    time_counts[k - 1 - times] ++;       
-                    count ++;         
-                }
-            }
         }
+        if ( average_step < time_steps.size()) {
+            cout << " --- |< " << (int) ( 100 * (double) average_step / (double) time_steps.size()) << " % >| ---\r";
+            flush(cout);
+        } else if (average_step == time_steps.size() - 1) {
+            cout << " --- |< 100 % >| ---\n";
+            flush(cout);
+        }
+        
     }
+    cout << " --- |< 100 % >| ---\n\n";    
+    ofstream output;
+    output.open(info.nrt_output.c_str());
+    output << "# Averaged " << 1 << " times.\n\n";
     for (int i = 0; i < time_counts.size(); i ++) {
-        output << i*info.time_step / 1000.0 << "\t" << 100 * time_counts[i] / counter << "\n";
+        output << i*info.time_step / 1000.0 << "\t" << 100.0 * time_counts[i] / normalizer << "\n";
     }
     
     return true;

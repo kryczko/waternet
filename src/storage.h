@@ -18,7 +18,7 @@ struct Information {
     std::string unwrapped_coords;
     bool sdf, network_reorganization_time, orientation_1D, full_msd;
     double sdf_start, sdf_end, starting_z, time_length;
-    int sdf_bins, num_cell_blocks;
+    int sdf_bins, num_cell_blocks, num_starts;
     std::string sdf_output, nrt_output;
     
     Information() {
@@ -32,6 +32,7 @@ struct Information {
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
         starting_z = time_length -1.0;
         num_cell_blocks = 1;
+        num_starts = -1;
     }
 };
 

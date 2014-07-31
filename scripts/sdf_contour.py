@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from matplotlib.mlab import griddata
 from matplotlib import cm
 import string
+from matplotlib import colors
+
 nooa = 100
 
 circles = []
@@ -53,9 +55,11 @@ yi = np.linspace(min(ycoords), max(ycoords), 100)
 
 hbi = griddata (xlist, ylist, hblist, xi, yi)
 
+colormap = colors.ListedColormap(['white', 'blue', 'green', 'yellow', 'orange', 'red'])
+
 v = np.linspace(0, max(hblist), 6, endpoint=True)
 CS = plt.contour(xi,yi,hbi,15,linewidths=0.5,colors='k')
-CS = plt.contourf(xi,yi,hbi,v,cmap=plt.cm.binary)
+CS = plt.contourf(xi,yi,hbi,v,cmap=colormap,alpha=1.0)
 plt.colorbar(CS)
 #plt.hlines(13.38, min(xcoords), max(xcoords), linewidth = 4)
 #plt.hlines(34.2, min(xcoords), max(xcoords), linewidth = 4)

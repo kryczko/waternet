@@ -1,8 +1,8 @@
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 12.33
-    y: 12.81
-    z: 32.796
+    x: 14.41
+    y: 14.41
+    z: 14.41
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
     O: 100
@@ -12,39 +12,39 @@ n_atoms:
 modules:
     
     # this module creates a neighbor list for the water molecules from the xyz file, it is needed for most other modules. 
-    create_edgelist: true    
+    create_edgelist: false    
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
     num_cell_blocks: 5
-    cell_block_start: 3.35
-    cell_block_end: 24.0
+    cell_block_start: 0
+    cell_block_end: 14.41
     
     # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
-    fix_plots: true
+    fix_plots: false
     starting_z: 5.0
     
     # create a graph xml file 
-    output_gephi: true
+    output_gephi: false
     
     # create a data file to plot the degree along the z-axis
-    degree_z: true
+    degree_z: false
     degree_bins: 500
     
     # create a data file to plot neighboring O-O distance distribution
-    OOdistro: true
+    OOdistro: false
     OO_bins: 1000
     OO_max_dist: 5.0
     
     # create a data file to plot local O-H distance distribution
-    OHdistro: true
+    OHdistro: false
     OH_bins: 1000
     OH_max_dist: 2.0
     
     # create a data file to plot local H-O-H angle distribution
-    HOHdistro: true
+    HOHdistro: false
     HOH_bins: 1000
     
     # create a data file for the cumulative degree distribution (coordination number)
-    degree_distro: true
+    degree_distro: false
     
     # create data files for each coordinate (x, y, and z) with density profiles
     density: true
@@ -67,7 +67,7 @@ modules:
     orient_z_bins: 20
     
     # create data files for 1D plots of the orientation for different layers
-    orientation_1D: true
+    orientation_1D: false
     
     # run dynamical analysis on the H group - ONLY USE WITH AN H-GROUP XYZ FILE 
     H_group_dynamics: false
@@ -76,16 +76,16 @@ modules:
     OH_group_dynamics: false
     
     # create a contour plotable file for the spacial distribution function
-    spacial_distribution_function: true
-    sdf_z_start: 13.35 # best to make this where your metal is
-    sdf_z_end: 21.0 # best to analyze the density profile and set this value accordingly
+    spacial_distribution_function: false
+    sdf_z_start: 20.05 # best to make this where your metal is
+    sdf_z_end: 25 # best to analyze the density profile and set this value accordingly
     sdf_bins: 20 # number of bins for atom binning
     
     # run analysis that calculates the time between water molecules switch partners
     # the plot outputted is the probability after some time (in ps) that you would
     # find a water molecule with the same partner
     # NOTE - for averaging purposes the num_starts is used here
-    network_reorganization_time: true
+    network_reorganization_time: false
     num_starts: 1000
     time_length: 7308 # - 0.1935: 1 ps = 5168 steps, - 0.2737: 1 ps = 3654 steps  ---- in timesteps, the function will average over this
     
@@ -94,7 +94,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/100_PBE_4lay.xyz      #
+    input: xyzfiles/100_PBE_pure.xyz      #
     #                                       #   
     #########################################
     
@@ -106,8 +106,8 @@ filenames:
     OHdistro_output: output/OHdistro.dat
     HOHdistro_output: output/HOHdistro.dat
     degree_distro_output: output/degree_distro_
-    x_density_output: output/xdensity.dat
-    y_density_output: output/ydensity.dat
+    x_density_output: output/xdensity
+    y_density_output: output/ydensity
     z_density_output: output/zdensity.dat
     mean_square_displacement_output: output/msd_
     orientation_2D_output: output/orientation_2D # the rest of the name will be added on wrt what the axis are

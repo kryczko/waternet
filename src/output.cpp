@@ -318,31 +318,122 @@ double wrap(double value, double lattice) {
 }
 
 bool density(Information& info, TimeSteps& time_steps) {
-    vector<int> xbins (info.density_bins), ybins (info.density_bins), zbins (info.density_bins),
-                O_xbins(info.density_bins), O_ybins(info.density_bins), O_zbins(info.density_bins),
-                H_xbins(info.density_bins), H_ybins(info.density_bins), H_zbins(info.density_bins);
+    double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
+    for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
+        double start_z = info.cell_block_start + cell*incr;
+        double end_z = info.cell_block_start + (cell+1)*incr;
+        vector<int> xbins (info.density_bins), ybins (info.density_bins),
+                    O_xbins(info.density_bins), O_ybins(info.density_bins),
+                    H_xbins(info.density_bins), H_ybins(info.density_bins);
+        for (int i = 0; i < info.density_bins; i ++) {
+            xbins[i] = 0;
+            ybins[i] = 0;
+            O_xbins[i] = 0;
+            O_ybins[i] = 0;
+            H_xbins[i] = 0;
+            H_ybins[i] = 0;
+        
+        }
+        double xbinsize = info.lattice_x / info.density_bins;
+        double ybinsize = info.lattice_y / info.density_bins; 
+        
+        double conversion, O_conversion = 1, H_conversion;
+        if (info.heavy_water) {
+            H_conversion = 2;
+            conversion = 20.0e-6/(6.023e23*1.0e-30);
+        } else {
+            H_conversion = 1;
+            conversion = 18.0e-6/(6.023e23*1.0e-30);
+        }
+        for (int i = 0; i < time_steps.size(); i ++) {
+            O_vector& Ovec = time_steps[i].O_atoms;
+            H_vector& Hvec = time_steps[i].H_atoms;
+            for (int j = 0; j < Ovec.size(); j ++) {
+                Oxygen& O = Ovec[j];
+                if (O.z_coords > start_z && O.z_coords < end_z) {
+                    double x = wrap(O.x_coords, info.lattice_x);
+                    double y = wrap(O.y_coords, info.lattice_y);
+                    int xbin = x / xbinsize;
+                    int ybin = y / ybinsize;
+                    xbins[xbin] ++;
+                    ybins[ybin] ++;
+                    O_xbins[xbin] ++;
+                    O_ybins[ybin] ++;
+                }
+            }
+            for (int j = 0; j < Hvec.size(); j ++) {
+                Hydrogen& H = Hvec[j];
+                if (H.z_coords > start_z && H.z_coords < end_z) {
+                    double x = wrap(H.x_coords, info.lattice_x);
+                    double y = wrap(H.y_coords, info.lattice_y);
+                    int xbin = x / xbinsize;
+                    int ybin = y / ybinsize;
+                    H_xbins[xbin] ++;
+                    H_ybins[ybin] ++;
+                }
+            }
+        }
+        
+        double xvol = xbinsize*info.lattice_y*(end_z-start_z), yvol = ybinsize*info.lattice_x*(end_z - start_z);
+        double xsum = 0, ysum = 0, O_xsum = 0, O_ysum = 0, H_xsum = 0, H_ysum = 0;
+        int xcount = 0, ycount = 0, O_xcount = 0, O_ycount = 0, H_xcount = 0, H_ycount = 0;
+        for (int i = 0; i < info.density_bins; i ++ ) {
+            xsum += xbins[i]*conversion / (xvol*info.n_frames);
+            ysum += ybins[i]*conversion / (yvol*info.n_frames);
+            O_xsum += O_xbins[i]*O_conversion / (xvol*info.n_frames);
+            O_ysum += O_ybins[i]*O_conversion / (yvol*info.n_frames);
+            H_xsum += H_xbins[i]*H_conversion / (xvol*info.n_frames);
+            H_ysum += H_ybins[i]*H_conversion / (yvol*info.n_frames);
+            if (xbins[i]) {
+                xcount ++;
+            }
+            if (ybins[i]) {
+                ycount ++;
+            }
+            if (O_xbins[i]) {
+                O_xcount ++;
+            }
+            if (O_ybins[i]) {
+                O_ycount ++;
+            }
+            if (H_xbins[i]) {
+                H_xcount ++;
+            }
+            if (H_ybins[i]) {
+                H_ycount ++;
+            }
+        }
+        ofstream xoutput, youtput;
+        string xoutputfile = info.xdens_output + "_region_" + to_string(cell) + ".dat";
+        string youtputfile = info.ydens_output + "_region_" + to_string(cell) + ".dat";
+        
+        xoutput.open(xoutputfile.c_str());
+        youtput.open(youtputfile.c_str());
+        
+        for (int i = 0; i < info.density_bins; i ++) {
+            xoutput << i*xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*O_conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*H_conversion / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
+            xoutput << i*xbinsize + xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*O_conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*H_conversion / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
+            youtput << i*ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*O_conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*H_conversion / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
+            youtput << i*ybinsize + ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*O_conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*H_conversion / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
+        }
+        xoutput.close();
+        youtput.close();
+    }
+    vector<int> zbins (info.density_bins), O_zbins(info.density_bins), H_zbins(info.density_bins);
     for (int i = 0; i < info.density_bins; i ++) {
-        xbins[i] = 0;
-        ybins[i] = 0;
         zbins[i] = 0;
-        O_xbins[i] = 0;
-        O_ybins[i] = 0;
-        O_zbins[i] = 0;
-        H_xbins[i] = 0;
-        H_ybins[i] = 0;
+        O_zbins[i] = 0; 
         H_zbins[i] = 0;
         
     }
-    double xbinsize = info.lattice_x / info.density_bins;
-    double ybinsize = info.lattice_y / info.density_bins;
     double zbinsize = info.lattice_z / info.density_bins;
     
-    double conversion, O_conversion = 16.0e-6/(6.023e23*1.0e-30), H_conversion;
+    double conversion, O_conversion = 1, H_conversion;
     if (info.heavy_water) {
-        H_conversion = 2.0e-6/(6.023e23*1.0e-30);
+        H_conversion = 2;
         conversion = 20.0e-6/(6.023e23*1.0e-30);
     } else {
-        H_conversion = 1.0e-6/(6.023e23*1.0e-30);
+        H_conversion = 1;
         conversion = 18.0e-6/(6.023e23*1.0e-30);
     }
     
@@ -351,68 +442,30 @@ bool density(Information& info, TimeSteps& time_steps) {
         H_vector& Hvec = time_steps[i].H_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
-            double x = wrap(O.x_coords, info.lattice_x);
-            double y = wrap(O.y_coords, info.lattice_y);
             double z = wrap(O.z_coords, info.lattice_z);
-            int xbin = x / xbinsize;
-            int ybin = y / ybinsize;
             int zbin = z / zbinsize;
-            xbins[xbin] ++;
-            ybins[ybin] ++;
             zbins[zbin] ++;
-            O_xbins[xbin] ++;
-            O_ybins[ybin] ++;
             O_zbins[zbin] ++;
         }
         for (int j = 0; j < Hvec.size(); j ++) {
             Hydrogen& H = Hvec[j];
-            double x = wrap(H.x_coords, info.lattice_x);
-            double y = wrap(H.y_coords, info.lattice_y);
             double z = wrap(H.z_coords, info.lattice_z);
-            int xbin = x / xbinsize;
-            int ybin = y / ybinsize;
             int zbin = z / zbinsize;
-            H_xbins[xbin] ++;
-            H_ybins[ybin] ++;
             H_zbins[zbin] ++;
         }
     }
-    double xvol = xbinsize*info.lattice_y*info.lattice_z, yvol = ybinsize*info.lattice_x*info.lattice_z, zvol = zbinsize*info.lattice_x*info.lattice_y;
-    double xsum = 0, ysum = 0, zsum = 0, O_xsum = 0, O_ysum = 0, O_zsum = 0, H_xsum = 0, H_ysum = 0, H_zsum = 0;
-    int xcount = 0, ycount = 0, zcount = 0, O_xcount = 0, O_ycount = 0, O_zcount = 0, H_xcount = 0, H_ycount = 0, H_zcount = 0;
+    double zvol = zbinsize*info.lattice_x*info.lattice_y;
+    double zsum = 0, O_zsum = 0, H_zsum = 0;
+    int zcount = 0, O_zcount = 0, H_zcount = 0;
     for (int i = 0; i < info.density_bins; i ++ ) {
-        xsum += xbins[i]*conversion / (xvol*info.n_frames);
-        ysum += ybins[i]*conversion / (yvol*info.n_frames);
         zsum += zbins[i]*conversion / (zvol*info.n_frames);
-        O_xsum += O_xbins[i]*conversion / (xvol*info.n_frames);
-        O_ysum += O_ybins[i]*conversion / (yvol*info.n_frames);
-        O_zsum += O_zbins[i]*conversion / (zvol*info.n_frames);
-        H_xsum += H_xbins[i]*0.5*conversion / (xvol*info.n_frames);
-        H_ysum += H_ybins[i]*0.5*conversion / (yvol*info.n_frames);
-        H_zsum += H_zbins[i]*0.5*conversion / (zvol*info.n_frames);
-        if (xbins[i]) {
-            xcount ++;
-        }
-        if (ybins[i]) {
-            ycount ++;
-        }
+        O_zsum += O_zbins[i]*O_conversion / (zvol*info.n_frames);
+        H_zsum += H_zbins[i]*H_conversion / (zvol*info.n_frames);
         if (zbins[i]) {
             zcount ++;
         }
-        if (O_xbins[i]) {
-            O_xcount ++;
-        }
-        if (O_ybins[i]) {
-            O_ycount ++;
-        }
         if (O_zbins[i]) {
             O_zcount ++;
-        }
-        if (H_xbins[i]) {
-            H_xcount ++;
-        }
-        if (H_ybins[i]) {
-            H_ycount ++;
         }
         if (H_zbins[i]) {
             H_zcount ++;
@@ -424,34 +477,24 @@ bool density(Information& info, TimeSteps& time_steps) {
     zoutput.open(info.zdens_output.c_str());
     if (info.fix_plots) {
         for (int i = 0; i < info.density_bins; i ++) {
-            xoutput << i*xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
-            xoutput << i*xbinsize + xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
-            youtput << i*ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
-            youtput << i*ybinsize + ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
             if (i*zbinsize > info.starting_z) {
-                zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
-                zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
+                zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
+                zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
             }
         }
         for (int i = 0; i < info.density_bins; i ++) {
             if (i*zbinsize < info.starting_z) {
-                zoutput << i*zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
-                zoutput << i*zbinsize + zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
+                zoutput << i*zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
+                zoutput << i*zbinsize + zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
             }
         }
     }
     else {
         for (int i = 0; i < info.density_bins; i ++) {
-            xoutput << i*xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
-            xoutput << i*xbinsize + xbinsize << "\t" << xbins[i]*conversion / (xvol*info.n_frames) << "\t" << O_xbins[i]*conversion / (xvol*info.n_frames) << "\t" << H_xbins[i]*conversion*0.5 / (xvol*info.n_frames) << "\t" << xsum / xcount << "\t" << O_xsum / O_xcount << "\t" << H_xsum / H_xcount << "\n";
-            youtput << i*ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
-            youtput << i*ybinsize + ybinsize << "\t" << ybins[i]*conversion / (yvol*info.n_frames) << "\t" << O_ybins[i]*conversion / (yvol*info.n_frames) << "\t" << H_ybins[i]*conversion*0.5 / (yvol*info.n_frames) << "\t" << ysum / ycount << "\t" << O_ysum / O_ycount << "\t" << H_ysum / H_ycount << "\n";
-            zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
-            zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*conversion*0.5 / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
+            zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
+            zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
         }
     }
-    xoutput.close();
-    youtput.close();
     zoutput.close();
     return true;
 }
@@ -597,18 +640,18 @@ bool msd(Information& info, TimeSteps& time_steps) {
                 dzh += H.unwrap_z;
             }
             if (info.heavy_water) {
-                double comx = (8*dxo + 2*dxh) / (8*Ovec.size() + 2*Hvec.size());
+                double comx = (16*dxo + 2*dxh) / (16*Ovec.size() + 2*Hvec.size());
                 COMx.push_back(comx);
-                double comy = (8*dyo + 2*dyh) / (8*Ovec.size() + 2*Hvec.size());
+                double comy = (16*dyo + 2*dyh) / (16*Ovec.size() + 2*Hvec.size());
                 COMy.push_back(comy);
-                double comz = (8*dzo + 2*dzh) / (8*Ovec.size() + 2*Hvec.size());
+                double comz = (16*dzo + 2*dzh) / (16*Ovec.size() + 2*Hvec.size());
                 COMz.push_back(comz);
             } else {
-                double comx = (8*dxo + dxh) / (8*Ovec.size() + Hvec.size());
+                double comx = (16*dxo + dxh) / (16*Ovec.size() + Hvec.size());
                 COMx.push_back(comx);
-                double comy = (8*dyo + dyh) / (8*Ovec.size() + Hvec.size());
+                double comy = (16*dyo + dyh) / (16*Ovec.size() + Hvec.size());
                 COMy.push_back(comy);
-                double comz = (8*dzo + dzh) / (8*Ovec.size() + Hvec.size());
+                double comz = (16*dzo + dzh) / (16*Ovec.size() + Hvec.size());
                 COMz.push_back(comz);
             }
         }

@@ -19,18 +19,18 @@ TimeSteps time_steps;
 H_group_info hgi;
 
 void print_welcome_message() {
-    cout << "\n\n";
-    cout << "\033[1;46m\033[1;37m ------------------------------------------------------------------------ \033[0m\n";      
-    cout << "\033[1;46m\033[1;37m|  W         W    A  TTTTTTTTT EEEEEEE R R R  N      N EEEEEEE TTTTTTTTT |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m| W           W  A A     T     E       R   R  N N    N E           T     |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m| W     W     W A   A    T     E       R  R   N  N   N E           T     |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m|  W   W W   W AAAAAAA   T     EEEEEEE R R    N   N  N EEEEEEE     T     |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m|   W W   W W A       A  T     E       R   R  N    N N E           T     |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m|    W     W A         A T     EEEEEEE R    R N      N EEEEEEE     T     |\033[0m\n";
-    cout << "\033[1;46m\033[1;37m ------------------------------------------------------------------------ \033[0m\n\n";
-    cout << "\033[1;46m\033[1;37m              WRITTEN BY K. RYCZKO, WITH HELP FROM I. TAMBLYN             \033[0m\n";
-    cout << "\033[1;46m\033[1;37m              UNIVERSITY OF ONTARIO INSTITUTE OF TECHNOLOGY               \033[0m\n";
-    cout << "\033[1;46m\033[1;37m            COMPUTATIONAL LABORATORY FOR ENERGY AND NANOSCIENCE           \033[0m\n\n\n";
+    cout << "\033[1;46m\033[1;37m\n\n";
+    cout << " ------------------------------------------------------------------------ \n";      
+    cout << "|  W         W    A  TTTTTTTTT EEEEEEE R R R  N      N EEEEEEE TTTTTTTTT |\n";
+    cout << "| W           W  A A     T     E       R   R  N N    N E           T     |\n";
+    cout << "| W     W     W A   A    T     E       R  R   N  N   N E           T     |\n";
+    cout << "|  W   W W   W AAAAAAA   T     EEEEEEE R R    N   N  N EEEEEEE     T     |\n";
+    cout << "|   W W   W W A       A  T     E       R   R  N    N N E           T     |\n";
+    cout << "|    W     W A         A T     EEEEEEE R    R N      N EEEEEEE     T     |\n";
+    cout << " ------------------------------------------------------------------------ \n\n";
+    cout << "              WRITTEN BY K. RYCZKO, WITH HELP FROM I. TAMBLYN             \n";
+    cout << "              UNIVERSITY OF ONTARIO INSTITUTE OF TECHNOLOGY               \n";
+    cout << "            COMPUTATIONAL LABORATORY FOR ENERGY AND NANOSCIENCE           \n\n\n";
 }
 
 int main() {
@@ -54,5 +54,6 @@ int main() {
         cout << "Error with dynamics, exiting...\n\n";
         return 0;
     }
+    cout << "\033[0m";
     return 0;
 }

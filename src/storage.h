@@ -13,7 +13,7 @@ struct Information {
     bool H_group_dynamics, OH_group_dynamics, write_unwrapped_xyz, fix_plots;
     int num_oxygen, num_hydrogen, timesteps, num_blocks, label_bins, degree_bins, OO_bins, OH_bins, HOH_bins, density_bins, orient_x_bins, orient_y_bins, orient_z_bins;
     double lattice_x, lattice_y, lattice_z, max_OO, max_OH, time_step, cell_block_start, cell_block_end;
-    int n_frames;
+    int n_frames, num_threads;
     std::string H_group_trajectory_filename, OH_group_trajectory_filename;
     std::string unwrapped_coords;
     bool sdf, network_reorganization_time, orientation_1D, full_msd;

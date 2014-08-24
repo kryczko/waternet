@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 #include <yaml-cpp/yaml.h>
+#include <iostream>
 
 #include "storage.h"
 
@@ -8,7 +9,7 @@ using namespace std;
 using namespace YAML;
 
 template<class T>
-static inline void parse(const Node& node, const char* key, T& value, bool optional = false) {
+static inline void parse(const Node& node, const char* key, T& value) {
     if (node.FindValue(key)) {
         node[key] >> value;
     } else {
@@ -19,6 +20,7 @@ static inline void parse(const Node& node, const char* key, T& value, bool optio
 
 void parse_inputfile(Information& info, const Node& node) {
     const Node& modules = node["modules"];
+    parse(modules, "num_threads", info.num_threads);
     parse(modules, "create_edgelist", info.create_edgelist);
     parse(modules, "num_cell_blocks", info.num_cell_blocks);
     parse(modules, "cell_block_start", info.cell_block_start);

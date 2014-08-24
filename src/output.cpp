@@ -2,6 +2,9 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+
+
+#include "omp.h"
 #include "storage.h"
 #include "edgelist.h"
 
@@ -53,6 +56,7 @@ bool output_graphfile(Information& info, TimeStep& time_step) {
     }
     output << "</edges>\n" << "</graph>\n" << "</gexf>";
     output.close();
+    cout << "Outputted Gephi graph file.\n\n";
     return true;
 }
 
@@ -118,6 +122,7 @@ bool degree_respect_z(Information& info, TimeSteps& time_steps) {
         }
     }
     output.close();
+    cout << "Outputted degree with respect to z data file.\n\n";
     return true;
 }
 
@@ -198,6 +203,7 @@ bool OHdistro(Information& info, TimeSteps& time_steps) {
         output << i*binsize + binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
     }
     output.close();
+    cout << "Outputted OO distribution data file.\n\n";
     return true;
 }
 
@@ -259,6 +265,8 @@ bool HOHdistro(Information& info, TimeSteps& time_steps) {
         output << (i + 1)*binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
     }
     output.close();
+    cout << "Outputting HOH angle data file.\n\n";
+    
     return true;
 }
 
@@ -305,6 +313,8 @@ bool degree_distro(Information& info, TimeSteps& time_steps) {
         }
         output.close();
     }
+    cout << "Outputted degree distribution data files.\n\n";
+    
     return true;
 }
 
@@ -496,6 +506,7 @@ bool density(Information& info, TimeSteps& time_steps) {
         }
     }
     zoutput.close();
+    cout << "Outputted density data files.\n\n";
     return true;
 }
 
@@ -765,6 +776,7 @@ bool msd(Information& info, TimeSteps& time_steps) {
         output.close();
         msd_vector.clear();
     }
+    cout << "Outputted mean square displacement data.\n\n";
     return true;
 }
 
@@ -828,6 +840,7 @@ bool orientation_1D(Information& info, TimeSteps& time_steps) {
         }
         output.close();
     }
+    cout << "Outputted 1D orientation data files.\n\n";
         return true;
 }
 
@@ -957,6 +970,7 @@ bool orientation(Information& info, TimeSteps& time_steps) {
     outputxz.close();
     outputyz.close();
     outputxz.close();
+    cout << "Outputted 2D orientation data files.\n\n";
     return true;
 }
 bool sdf(Information& info, TimeSteps& time_steps) {
@@ -1007,6 +1021,7 @@ bool sdf(Information& info, TimeSteps& time_steps) {
 
     O_output.close();
     H_output.close();
+    cout << "Outputted spacial distribution function data files.\n\n";
     return true;
 }
 
@@ -1082,7 +1097,7 @@ bool nrt(Information& info, TimeSteps& time_steps) {
     for (int i = 0; i < time_counts.size(); i ++) {
         output << i*info.time_step / 1000.0 << "\t" << 100.0 * time_counts[i] / normalizer << "\n";
     }
-    
+    cout << "Outputted network reorganization time data file.\n\n";
     return true;
 }
 
@@ -1106,7 +1121,59 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     }
     out_count(info, time_steps);
     
-    if (info.output_gephi) {
+    // vector of function pointers
+    vector<bool (*)(Information&, TimeSteps&)> vec_fp;
+    // vector of decisions if functions are called
+    vector<bool> dec;
+    
+    bool(*fpointer)(Information&, TimeSteps&);
+    
+    fpointer = degree_respect_z;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.degree_z);
+    
+    fpointer = OOdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.OODistro);
+    
+    fpointer = OHdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.OHDistro);
+    
+    fpointer = HOHdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.HOHDistro);
+    
+    fpointer = degree_distro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.degree_distro);
+    
+    fpointer = density;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.density);
+    
+    fpointer = msd;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.msd);
+    
+    fpointer = orientation;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.orientation);
+    
+    fpointer = orientation_1D;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.orientation_1D);
+    
+    fpointer = sdf;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.sdf);
+    
+    fpointer = nrt;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.network_reorganization_time);
+   
+    
+    /*if (info.output_gephi) {
         output_graphfile(info, time_steps[time_steps.size() - 1]);
         cout << "Gephi graph file created.\n\n";
     }
@@ -1153,6 +1220,14 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     if (info.network_reorganization_time) {
         nrt(info, time_steps);
         cout << "Outputted network reorganization time data file.\n\n";
+    }*/
+    omp_set_dynamic(0);
+    omp_set_num_threads(info.num_threads);
+    #pragma omp parallel for 
+    for (int i = 0; i < vec_fp.size(); i ++) {  
+        if (dec[i]) {
+            vec_fp[i](info, time_steps);
+        }
     }
     return true;
 }

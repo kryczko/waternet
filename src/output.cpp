@@ -4,7 +4,7 @@
 #include <string>
 #include <pthread.h>
 
-//#include "omp.h"
+#include "omp.h"
 #include "storage.h"
 #include "edgelist.h"
 
@@ -26,10 +26,9 @@ int num_edges(O_vector& Ovec) {
     return count;
 }
 
-void *output_graphfile(void * arg_ptr) {
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeStep& time_step = args->arg_time_step;
+void *output_graphfile(Args& args) {
+    Information& info = args.arg_info;
+    TimeStep& time_step = args.arg_time_step;
     
     O_vector& Ovec = time_step.O_atoms;
     int n_bins = info.num_cell_blocks;
@@ -67,13 +66,12 @@ void *output_graphfile(void * arg_ptr) {
     output << "</edges>\n" << "</graph>\n" << "</gexf>";
     output.close();
     cout << "Outputted Gephi graph file.\n\n";
-    pthread_exit(NULL);
+    
 }
 
-void * degree_respect_z(void * arg_ptr) {
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+void * degree_respect_z(Args& args) {
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     ofstream output;
     
@@ -138,7 +136,7 @@ void * degree_respect_z(void * arg_ptr) {
     }
     output.close();
     cout << "Outputted degree with respect to z data file.\n\n";
-    pthread_exit(NULL);
+    
 }
 
 void out_count(Information& info, TimeSteps& time_steps) {
@@ -154,11 +152,10 @@ void out_count(Information& info, TimeSteps& time_steps) {
     }
 }
 
-void * OOdistro(void * arg_ptr) {
+void * OOdistro(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> bins ( info.OO_bins );
     int counter = 0;
@@ -189,15 +186,14 @@ void * OOdistro(void * arg_ptr) {
         output << i*binsize + binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
     }
     output.close();
-    pthread_exit(NULL);
+    
     
 }
 
-void *OHdistro(void * arg_ptr) {
+void *OHdistro(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     vector<int> bins ( info.OH_bins );
     int counter = 0;
     double binsize = info.max_OH / info.OH_bins;
@@ -229,7 +225,7 @@ void *OHdistro(void * arg_ptr) {
     }
     output.close();
     cout << "Outputted OO distribution data file.\n\n";
-    pthread_exit(NULL);
+    
     
 }
 
@@ -258,12 +254,11 @@ double HOHangle(Oxygen& O, Hydrogen& H1, Hydrogen& H2, Information& info) {
     return angle;
 }
 
-void * HOHdistro(void * arg_ptr) {
+void * HOHdistro(Args& args) {
     // 360 degrees, bin for each degree
-    
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    ;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> bins ( info.HOH_bins );
     double binsize = 360.0 / info.HOH_bins;
@@ -297,16 +292,15 @@ void * HOHdistro(void * arg_ptr) {
     }
     output.close();
     cout << "Outputting HOH angle data file.\n\n";
-    pthread_exit(NULL);
+    
     
     
 }
 
-void * degree_distro(void* arg_ptr) {
+void * degree_distro(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
     for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
@@ -351,7 +345,7 @@ void * degree_distro(void* arg_ptr) {
         output.close();
     }
     cout << "Outputted degree distribution data files.\n\n";
-    pthread_exit(NULL);
+    
     
     
 }
@@ -365,11 +359,10 @@ double wrap(double value, double lattice) {
     return value;
 }
 
-void * density(void* arg_ptr) {
+void * density(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
     for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
@@ -550,7 +543,7 @@ void * density(void* arg_ptr) {
     }
     zoutput.close();
     cout << "Outputted density data files.\n\n";
-    pthread_exit(NULL);
+    
     
 }
 
@@ -653,11 +646,10 @@ typedef std::vector<MsdStep> msd_vec;
 
 msd_vec msd_vector;
 
-void * msd(void* arg_ptr) {
+void * msd(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     unwrap(info, time_steps);
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
@@ -826,15 +818,14 @@ void * msd(void* arg_ptr) {
         msd_vector.clear();
     }
     cout << "Outputted mean square displacement data.\n\n";
-    pthread_exit(NULL);
+    
     
 }
 
-void *orientation_1D(void* arg_ptr) {
+void *orientation_1D(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
     for (int cell = 0; cell < info.num_cell_blocks; cell ++) {
@@ -898,11 +889,10 @@ void *orientation_1D(void* arg_ptr) {
     cout << "Outputted 1D orientation data files.\n\n";
 }
 
-void* orientation(void* arg_ptr) {
+void* orientation(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<double> posx, posy, posz, vecx, vecy, vecz;
     for (int i = 0; i < time_steps.size(); i ++) {
@@ -1030,14 +1020,13 @@ void* orientation(void* arg_ptr) {
     outputyz.close();
     outputxz.close();
     cout << "Outputted 2D orientation data files.\n\n";
-    pthread_exit(NULL);
+    
     
 }
-void* sdf(void* arg_ptr) {
+void* sdf(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     double Obins[info.sdf_bins][info.sdf_bins], Hbins[info.sdf_bins][info.sdf_bins];
     for (int i = 0; i < info.sdf_bins; i ++) {
@@ -1087,7 +1076,7 @@ void* sdf(void* arg_ptr) {
     O_output.close();
     H_output.close();
     cout << "Outputted spacial distribution function data files.\n\n";
-    pthread_exit(NULL);
+    
     
 }
 
@@ -1108,11 +1097,10 @@ vector<int> set_zero(vector<int>& vec) {
     return vec;
 }
 
-void* nrt(void* arg_ptr) {
+void* nrt(Args& args) {
     
-    struct Args * args = (struct Args *) arg_ptr;
-    Information& info = args->arg_info;
-    TimeSteps& time_steps = args->arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> time_counter;
     
@@ -1169,7 +1157,6 @@ void* nrt(void* arg_ptr) {
         output << i*info.time_step / 1000.0 << "\t" << 100.0 * time_counts[i] / normalizer << "\n";
     }
     cout << "Outputted network reorganization time data file.\n\n";
-    pthread_exit(NULL);
     
 }
 
@@ -1193,17 +1180,63 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     }
     out_count(info, time_steps);
     
-   /*
-    THIS IS FOR OPENMP
+   
+    //THIS IS FOR OPENMP
      // vector of function pointers
-    vector<bool (*)(Information&, TimeSteps&)> vec_fp;
+    vector<void * (*)(Args&)> vec_fp;
     // vector of decisions if functions are called
     vector<bool> dec;
     
-    bool(*fpointer)(Information&, TimeSteps&);
-    */
+    void *(*fpointer)(Args&);
     
+    
+    fpointer = output_graphfile;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.output_gephi);
 
+    fpointer = degree_respect_z;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.degree_z);
+    
+    fpointer = OOdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.OODistro);
+    
+    fpointer = OHdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.OHDistro);
+    
+    fpointer = HOHdistro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.HOHDistro);
+    
+    fpointer = degree_distro;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.degree_distro);
+    
+    fpointer = density;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.density);
+    
+    fpointer = msd;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.msd);
+    
+    fpointer = orientation;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.orientation);
+    
+    fpointer = orientation_1D;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.orientation_1D);
+    
+    fpointer = sdf;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.sdf);
+    
+    fpointer = nrt;
+    vec_fp.push_back(fpointer);
+    dec.push_back(info.network_reorganization_time);
    
     
     /*if (info.output_gephi) {
@@ -1254,70 +1287,25 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
         nrt(info, time_steps);
         cout << "Outputted network reorganization time data file.\n\n";
     }*/
-    
+    Args args;
+    args.arg_info = info;
+    args.arg_time_step = time_steps[0]; 
+    args.arg_time_steps = time_steps;
     
     // OPENMP parallelization
-    /*omp_set_dynamic(0);
+    omp_set_dynamic(0);
     omp_set_num_threads(info.num_threads);
     #pragma omp parallel for 
     for (int i = 0; i < vec_fp.size(); i ++) {  
         if (dec[i]) {
-            vec_fp[i](info, time_steps);
+            vec_fp[i](args);
         }
-    }*/
-    void*(*fpointer)(void*);
-    vector<void* (*)(void*)> vec_fp;
-    vector<bool> dec;
-    
-    fpointer = output_graphfile;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.output_gephi);
+    }
 
-    fpointer = degree_respect_z;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.degree_z);
     
-    fpointer = OOdistro;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.OODistro);
     
-    fpointer = OHdistro;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.OHDistro);
-    
-    fpointer = HOHdistro;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.HOHDistro);
-    
-    fpointer = degree_distro;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.degree_distro);
-    
-    fpointer = density;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.density);
-    
-    fpointer = msd;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.msd);
-    
-    fpointer = orientation;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.orientation);
-    
-    fpointer = orientation_1D;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.orientation_1D);
-    
-    fpointer = sdf;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.sdf);
-    
-    fpointer = nrt;
-    vec_fp.push_back(fpointer);
-    dec.push_back(info.network_reorganization_time);
 
-    // pthread parallelization   
+    /*// pthread parallelization   
     Args args;
     args.arg_info = info;
     args.arg_time_step = time_steps[0]; 
@@ -1325,12 +1313,14 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     pthread_t threads[vec_fp.size()];
     for (int i = 0; i < vec_fp.size(); i ++) {
         if (dec[i]) {
-            int thread = pthread_create(&threads[0], NULL, vec_fp[i], (void *) &args);
+            int thread = pthread_create(&threads[i], NULL, vec_fp[i], (void *) &args);
             if (thread) {
                 cout << "Error with thread.\n";
             }
         }
     }
-    pthread_exit(NULL);
+    for (auto& thread : threads) {
+        pthread_join(thread, NULL);
+    }*/
     return true;
 }

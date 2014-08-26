@@ -1,4 +1,4 @@
-FILE(REMOVE_RECURSE
+file(REMOVE_RECURSE
   "CMakeFiles/yaml-cpp.dir/src/aliasmanager.cpp.o"
   "CMakeFiles/yaml-cpp.dir/src/binary.cpp.o"
   "CMakeFiles/yaml-cpp.dir/src/conversion.cpp.o"
@@ -29,6 +29,6 @@ FILE(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-FOREACH(lang CXX)
-  INCLUDE(CMakeFiles/yaml-cpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
-ENDFOREACH(lang)
+foreach(lang CXX)
+  include(CMakeFiles/yaml-cpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

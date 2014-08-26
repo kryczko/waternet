@@ -1,17 +1,17 @@
 # enter the lattice constants for your supercell
 lattice_constants:
-    x: 12.42
-    y: 12.42
-    z: 12.42
+    x: 14.41
+    y: 14.41
+    z: 14.41
 # enter the number of oxygen and hydrogen atoms
 n_atoms:
-    O: 64
-    H: 128
+    O: 100
+    H: 200
 
 # perform which modules?
 modules:
     
-    num_threads: 3
+    num_threads: 1
     # this module creates a neighbor list for the water molecules from the xyz file, it is needed for most other modules. 
     create_edgelist: true    
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
@@ -45,12 +45,12 @@ modules:
     HOH_bins: 1000
     
     # create a data file for the cumulative degree distribution (coordination number)
-    degree_distro: true
+    degree_distro: false
     
     # create data files for each coordinate (x, y, and z) with density profiles
     density: true
     density_bins: 500
-    heavy_water: true
+    heavy_water: false
         
     # create data file for mean square displacement
     mean_square_displacement: true
@@ -95,7 +95,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/test.xyz      #
+    input: xyzfiles/100_PBE_pure.xyz      #
     #                                       #   
     #########################################
     

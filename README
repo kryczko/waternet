@@ -1,4 +1,4 @@
-                      ************* WATERNET *************
+TERNET *************
 
 This code has modules for computing different distributions for atomic trajectories of water.The input file type MUST be an xyz file. See the file "input.yaml" before running the main executible 'main' found in the directory 'src'. The input file allows you to adjust some parameters like the number of oxygen atoms, hydrogen atoms, supercell dimensions, and it allows you to turn on/off modules. If a module is selected, there will be a message outputted to the screen upon completion of the module. If you would like to add in code, then you must have lib-yaml installed in order to run the very simple Makefile.
 

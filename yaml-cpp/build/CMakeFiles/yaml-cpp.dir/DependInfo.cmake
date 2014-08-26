@@ -1,9 +1,9 @@
 # The set of languages for which implicit dependencies are needed:
-SET(CMAKE_DEPENDS_LANGUAGES
+set(CMAKE_DEPENDS_LANGUAGES
   "CXX"
   )
 # The set of files for implicit dependencies of each language:
-SET(CMAKE_DEPENDS_CHECK_CXX
+set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/kryczko/git/waternet/yaml-cpp/src/aliasmanager.cpp" "/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir/src/aliasmanager.cpp.o"
   "/Users/kryczko/git/waternet/yaml-cpp/src/binary.cpp" "/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o"
   "/Users/kryczko/git/waternet/yaml-cpp/src/conversion.cpp" "/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir/src/conversion.cpp.o"
@@ -30,22 +30,22 @@ SET(CMAKE_DEPENDS_CHECK_CXX
   "/Users/kryczko/git/waternet/yaml-cpp/src/stream.cpp" "/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o"
   "/Users/kryczko/git/waternet/yaml-cpp/src/tag.cpp" "/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o"
   )
-SET(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
-SET(CMAKE_TARGET_DEFINITIONS
+set(CMAKE_TARGET_DEFINITIONS
   "YAML_CPP_NO_CONTRIB"
   )
 
 # Targets to which this target links.
-SET(CMAKE_TARGET_LINKED_INFO_FILES
+set(CMAKE_TARGET_LINKED_INFO_FILES
   )
 
 # The include file search paths:
-SET(CMAKE_C_TARGET_INCLUDE_PATH
+set(CMAKE_C_TARGET_INCLUDE_PATH
   "../include"
   "../src"
   )
-SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
-SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
-SET(CMAKE_ASM_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+set(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+set(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+set(CMAKE_ASM_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})

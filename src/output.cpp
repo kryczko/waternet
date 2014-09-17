@@ -359,6 +359,62 @@ double wrap(double value, double lattice) {
     return value;
 }
 
+int find_lowest(vector<int>& vec) {
+    for (int i = 0; i < vec.size(); i ++) {
+        if (vec[i] > 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int find_largest(vector<int>& vec) {
+    for (int i = vec.size() - 1; i >=0; i --) {
+        if (vec[i] > 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void fix_data(vector<int>& bins, double binsize, double start) {
+    for (int i = 0; i < bins.size(); i ++) {
+        if (i*binsize < start) {
+            bins.push_back(bins[i]);
+            bins.erase(bins.begin() + i);
+        }
+    }
+}
+
+void create_symmetry_density(Information& info, vector<int>& zbins, vector<int>& O_zbins, vector<int>& H_zbins, int zsum, int O_zsum, int H_sum, double conversion, double O_conversion, double H_conversion, double zvol) {
+    
+    double binsize = info.lattice_z / info.density_bins;
+    fix_data(zbins, binsize, info.starting_z);
+    
+    int low_z = find_lowest(zbins);
+    int high_z = find_largest(zbins);
+    int z_diff = high_z - low_z;
+    vector<double> z_avg;
+    double count = 0;
+    if (z_diff % 2 != 0 ) { // even
+        for (int i = low_z; i <= high_z / 2 ; i ++) {
+            double val = (zbins[i] + zbins[high_z - i]) * 0.5;
+            z_avg.push_back(val);
+        }
+    } else {
+        for (int i = low_z; i <= ((int) high_z / 2) + 1; i ++) {
+            double val = (zbins[i] + zbins[high_z - i]) * 0.5;
+            z_avg.push_back(val);
+        }
+    }
+    ofstream output; 
+    output.open("output/avg_z.dat");
+    for (int i = 0 ; i < z_avg.size(); i ++) {
+        output << i*binsize << "\t" << z_avg[i]*conversion / (zvol*info.n_frames) << "\n";
+    }
+    
+}
+
 void * density(Args& args) {
     
     Information& info = args.arg_info;
@@ -483,6 +539,7 @@ void * density(Args& args) {
         conversion = 18.0e-6/(6.023e23*1.0e-30);
     }
     
+    
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
@@ -517,6 +574,7 @@ void * density(Args& args) {
             H_zcount ++;
         }
     }
+    create_symmetry_density(info, zbins, O_zbins, H_zbins, zsum, O_zsum, H_zsum, conversion, O_conversion, H_conversion, zvol);
     ofstream xoutput, youtput, zoutput;
     xoutput.open(info.xdens_output.c_str());
     youtput.open(info.ydens_output.c_str());
@@ -1160,6 +1218,68 @@ void* nrt(Args& args) {
     
 }
 
+class VHelper {
+public:
+    vector<double> velocities;
+};
+
+typedef vector<VHelper> VHelp_Vector;
+
+double average(vector<double>& vec) {
+    double sum = 0;
+    for (double& elem : vec) {
+        sum += elem;
+    }
+    return sum / vec.size(); 
+}
+
+void * vel_check(Args& args) {
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
+    VHelp_Vector vhelper(time_steps.size() - 1);
+    for (int i = 1; i < time_steps.size(); i ++) {
+        O_vector& Ovec_then = time_steps[i].O_atoms;
+        O_vector& Ovec_now = time_steps[i-1].O_atoms;
+        H_vector& Hvec_then = time_steps[i].H_atoms;
+        H_vector& Hvec_now = time_steps[i-1].H_atoms;
+        for (int j = 0; j < Ovec_now.size(); j ++) {
+            double dx = Ovec_then[j].x_coords - Ovec_now[j].x_coords;
+            dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
+            double dy = Ovec_then[j].y_coords - Ovec_now[j].y_coords;
+            dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
+            
+            double dz = Ovec_then[j].z_coords - Ovec_now[j].z_coords;
+            dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
+            
+            double dist = sqrt(dx*dx + dy*dy + dz*dz);
+            double velO = dist / info.time_step;
+            vhelper[i].velocities.push_back(velO);
+        }
+        for (int j = 0; j < Hvec_now.size(); j ++) {
+            double dx = Hvec_then[j].x_coords - Hvec_now[j].x_coords;
+            dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
+            
+            double dy = Hvec_then[j].y_coords - Hvec_now[j].y_coords;
+            dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
+            
+            double dz = Hvec_then[j].z_coords - Hvec_now[j].z_coords;
+            dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
+            
+            double dist = sqrt(dx*dx + dy*dy + dz*dz);
+            double velH = dist / info.time_step;
+            
+            vhelper[i].velocities.push_back(velH);
+        }
+    }
+    
+    ofstream output;
+    output.open("output/vel_test.xyz");
+    for (int i = 0; i < vhelper.size(); i ++) {
+        output << "Timestep: " << i << "\tAvg vel: " << average(vhelper[i].velocities) << "\n";
+    }
+    output.close();
+}
+
 bool output_edgelist(Information& info, TimeSteps& time_steps) {
     if (info.create_edgelist) {
         ofstream output;
@@ -1238,7 +1358,9 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     vec_fp.push_back(fpointer);
     dec.push_back(info.network_reorganization_time);
    
-    
+    fpointer = vel_check;
+    vec_fp.push_back(fpointer);
+    dec.push_back(true);
     /*if (info.output_gephi) {
         output_graphfile(info, time_steps[time_steps.size() - 1]);
         cout << "Gephi graph file created.\n\n";
@@ -1302,11 +1424,9 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
         }
     }
 
-    
-    
 
-    /*// pthread parallelization   
-    Args args;
+    // pthread parallelization   
+    /*Args args;
     args.arg_info = info;
     args.arg_time_step = time_steps[0]; 
     args.arg_time_steps = time_steps;

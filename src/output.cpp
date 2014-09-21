@@ -359,60 +359,31 @@ double wrap(double value, double lattice) {
     return value;
 }
 
-int find_lowest(vector<int>& vec) {
-    for (int i = 0; i < vec.size(); i ++) {
-        if (vec[i] > 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int find_largest(vector<int>& vec) {
-    for (int i = vec.size() - 1; i >=0; i --) {
-        if (vec[i] > 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void fix_data(vector<int>& bins, double binsize, double start) {
-    for (int i = 0; i < bins.size(); i ++) {
-        if (i*binsize < start) {
-            bins.push_back(bins[i]);
-            bins.erase(bins.begin() + i);
+void remove_zeros(vector<double>& dens, vector<double>& pos) {
+    for (int i = 0; i < dens.size(); i ++) {
+        if (dens[i] < 0.1) {
+            dens.erase(dens.begin()+i);
+            pos.erase(pos.begin()+i);
         }
     }
 }
 
-void create_symmetry_density(Information& info, vector<int>& zbins, vector<int>& O_zbins, vector<int>& H_zbins, int zsum, int O_zsum, int H_sum, double conversion, double O_conversion, double H_conversion, double zvol) {
-    
-    double binsize = info.lattice_z / info.density_bins;
-    fix_data(zbins, binsize, info.starting_z);
-    
-    int low_z = find_lowest(zbins);
-    int high_z = find_largest(zbins);
-    int z_diff = high_z - low_z;
-    vector<double> z_avg;
-    double count = 0;
-    if (z_diff % 2 != 0 ) { // even
-        for (int i = low_z; i <= high_z / 2 ; i ++) {
-            double val = (zbins[i] + zbins[high_z - i]) * 0.5;
-            z_avg.push_back(val);
-        }
-    } else {
-        for (int i = low_z; i <= ((int) high_z / 2) + 1; i ++) {
-            double val = (zbins[i] + zbins[high_z - i]) * 0.5;
-            z_avg.push_back(val);
-        }
-    }
-    ofstream output; 
+void create_symmetry_density(vector<double>& dens, vector<double>& pos) {
+    cout << dens.size() << "\n";
+    remove_zeros(dens, pos);
+    cout << dens.size() << "\n";
+    ofstream output;
     output.open("output/avg_z.dat");
-    for (int i = 0 ; i < z_avg.size(); i ++) {
-        output << i*binsize << "\t" << z_avg[i]*conversion / (zvol*info.n_frames) << "\n";
+    vector<double> new_dens;
+    new_dens.resize(dens.size() / 2);
+    output << pos[0] << "\t" << 0.0 << "\n";
+    for (int i = 0; i < new_dens.size(); i ++) {
+            new_dens[i] = (dens[i] + dens[dens.size() - i - 1]) / 2.0; 
+            output << pos[i] << "\t" << new_dens[i] << "\n";
+            output << pos[i+1] << "\t" << new_dens[i] << "\n";
     }
     
+    output.close();
 }
 
 void * density(Args& args) {
@@ -574,7 +545,8 @@ void * density(Args& args) {
             H_zcount ++;
         }
     }
-    create_symmetry_density(info, zbins, O_zbins, H_zbins, zsum, O_zsum, H_zsum, conversion, O_conversion, H_conversion, zvol);
+    vector<double> z_dens;
+    vector<double> where;
     ofstream xoutput, youtput, zoutput;
     xoutput.open(info.xdens_output.c_str());
     youtput.open(info.ydens_output.c_str());
@@ -582,12 +554,22 @@ void * density(Args& args) {
     if (info.fix_plots) {
         for (int i = 0; i < info.density_bins; i ++) {
             if (i*zbinsize > info.starting_z) {
+                if (zbins[i]) {
+                    z_dens.push_back(zbins[i]*conversion / (zvol*info.n_frames));
+                    where.push_back(i*zbinsize);    
+                }
+                
                 zoutput << i*zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
                 zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
             }
         }
         for (int i = 0; i < info.density_bins; i ++) {
             if (i*zbinsize < info.starting_z) {
+                if (zbins[i]) {
+                
+                z_dens.push_back(zbins[i]*conversion / (zvol*info.n_frames));
+                where.push_back(i*zbinsize + info.lattice_z);
+            }
                 zoutput << i*zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
                 zoutput << i*zbinsize + zbinsize + info.lattice_z << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";   
             }
@@ -600,6 +582,8 @@ void * density(Args& args) {
         }
     }
     zoutput.close();
+    create_symmetry_density(z_dens, where);
+    
     cout << "Outputted density data files.\n\n";
     
     

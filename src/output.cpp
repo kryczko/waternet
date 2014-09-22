@@ -581,9 +581,7 @@ void * density(Args& args) {
             zoutput << i*zbinsize + zbinsize << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\t" << zsum / zcount << "\t" << O_zsum / O_zcount << "\t" << H_zsum / H_zcount << "\n";
         }
     }
-    zoutput.close();
-    create_symmetry_density(z_dens, where);
-    
+    zoutput.close();    
     cout << "Outputted density data files.\n\n";
     
     
@@ -1264,6 +1262,113 @@ void * vel_check(Args& args) {
     output.close();
 }
 
+double find_max_m(M_vector& M_atoms, Information& info) {
+    double val = 0;
+    for (auto& M : M_atoms) {
+        if (info.lattice_z - M.z_coords < 1 ) {
+            M.z_coords -= info.lattice_z;
+        }
+        if (M.z_coords > val) {
+            val = M.z_coords;
+        }
+    }
+    return val;
+}
+
+double find_min_m(M_vector& M_atoms) {
+    double val = 100000; // some large value
+    for (auto& M : M_atoms) {
+        if (M.z_coords < val) {
+            val = M.z_coords;
+        }
+    }
+    return val;
+}
+
+double metals_avg_right(TimeSteps& time_steps, Information& info) {
+    double sum = 0;
+    double counter = 0;
+    for (int i = 0; i < time_steps.size(); i ++) {
+        double max_m = find_max_m(time_steps[i].M_atoms, info);
+        for (auto& M : time_steps[i].M_atoms) {
+            if (abs(M.z_coords - max_m) < 1.0) {
+                sum += M.z_coords;
+                counter += 1;
+            }
+        }
+    }
+    
+    return sum / counter;
+} 
+
+double metals_avg_left(TimeSteps& time_steps) {
+    double sum = 0;
+    double counter = 0;
+    for (int i = 0; i < time_steps.size(); i ++) {
+        double min_m = find_min_m(time_steps[i].M_atoms);
+        for (auto& M : time_steps[i].M_atoms) {
+            if (abs(M.z_coords - min_m) < 1.0) {
+                sum += M.z_coords;
+                counter += 1;
+            }
+        }
+    }
+    
+    return sum / counter;
+} 
+
+double min(double x, double y) {
+    if (x < y) {
+        return x;
+    } 
+    return y;
+}
+
+void * zdens_from_metal(Args& args) {
+        Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
+    double average_left = metals_avg_left(time_steps);
+    double average_right = metals_avg_right(time_steps, info);
+    double metal_dist = average_right - average_left;
+    double water_z_dist = info.lattice_z - metal_dist;
+    
+    vector<int> zbins(info.density_bins), O_zbins(info.density_bins), H_zbins(info.density_bins);
+    double zinc = 0.5 * water_z_dist / info.density_bins;
+    
+    double conversion, O_conversion = 1, H_conversion;
+    if (info.heavy_water) {
+        H_conversion = 2;
+        conversion = 20.0e-6/(6.023e23*1.0e-30);
+    } else {
+        H_conversion = 1;
+        conversion = 18.0e-6/(6.023e23*1.0e-30);
+    }
+    double zvol = info.lattice_x*info.lattice_y*zinc;
+    ofstream zoutput;
+    zoutput.open("output/dens_from_metal.dat");
+    for (int i = 0; i < time_steps.size(); i ++) {
+        O_vector& Ovec = time_steps[i].O_atoms;
+        H_vector& Hvec = time_steps[i].H_atoms;
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
+            double z = min(abs(O.z_coords - average_left), abs(O.z_coords - average_right));
+            int zbin = z / zinc;
+            zbins[zbin] ++;
+            O_zbins[zbin] ++;
+        }
+        for (int j = 0; j < Hvec.size(); j ++) {
+            Hydrogen& H = Hvec[j];
+            double z = min(abs(H.z_coords - average_left), abs(H.z_coords - average_right));
+            int zbin = z / zinc;
+            H_zbins[zbin] ++;
+        }
+    }
+    for (int i = 0; i < info.density_bins; i ++) {
+        zoutput << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";
+        zoutput << i*zinc + zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";   
+    }
+}
+
 bool output_edgelist(Information& info, TimeSteps& time_steps) {
     if (info.create_edgelist) {
         ofstream output;
@@ -1344,7 +1449,13 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
    
     fpointer = vel_check;
     vec_fp.push_back(fpointer);
+    dec.push_back(false); 
+    
+    fpointer = zdens_from_metal;
+    vec_fp.push_back(fpointer);
     dec.push_back(true);
+    
+    
     /*if (info.output_gephi) {
         output_graphfile(info, time_steps[time_steps.size() - 1]);
         cout << "Gephi graph file created.\n\n";

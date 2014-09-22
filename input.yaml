@@ -7,10 +7,11 @@ lattice_constants:
 n_atoms:
     O: 100
     H: 200
+    metal: 112  
 
 # perform which modules?
 modules:
-    
+    metal: Pt
     num_threads: 1
     # this module creates a neighbor list for the water molecules from the xyz file, it is needed for most other modules. 
     create_edgelist: true    

@@ -20,6 +20,7 @@ static inline void parse(const Node& node, const char* key, T& value) {
 
 void parse_inputfile(Information& info, const Node& node) {
     const Node& modules = node["modules"];
+    parse(modules, "metal", info.metal);
     parse(modules, "num_threads", info.num_threads);
     parse(modules, "create_edgelist", info.create_edgelist);
     parse(modules, "num_cell_blocks", info.num_cell_blocks);
@@ -90,6 +91,7 @@ void parse_inputfile(Information& info, const Node& node) {
     const Node& atoms = node["n_atoms"];
     parse(atoms, "O", info.num_oxygen);
     parse(atoms, "H", info.num_hydrogen);
+    parse(atoms, "metal", info.num_metals);
 }
 
 bool read_configfile(Information& info) {

@@ -6,7 +6,7 @@
 
 
 struct Information {
-    std::string input_filename;
+    std::string input_filename, metal;
     std::string edgelist_output_filename, in_degree, out_degree, cumulative_degree, gephi_output, degree_z_output, msd_filename, orientation_filename;
     std::string OO_output, OH_output, HOH_output, degree_output, xdens_output, ydens_output, zdens_output;
     bool create_edgelist, output_gephi, degree_z, OODistro, OHDistro, HOHDistro, degree_distro, density, heavy_water, msd, orientation;
@@ -18,7 +18,7 @@ struct Information {
     std::string unwrapped_coords;
     bool sdf, network_reorganization_time, orientation_1D, full_msd;
     double sdf_start, sdf_end, starting_z, time_length;
-    int sdf_bins, num_cell_blocks, num_starts;
+    int sdf_bins, num_cell_blocks, num_starts, num_metals;
     std::string sdf_output, nrt_output;
     
     Information() {
@@ -32,9 +32,26 @@ struct Information {
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
         starting_z = time_length -1.0;
         num_cell_blocks = 1;
-        num_starts = -1;
+        num_starts = num_metals = -1;
     }
 };
+
+struct Metal {
+    std::string name; 
+    int ID;
+    double x_coords;
+    double y_coords;
+    double z_coords;
+    double unwrap_x;
+    double unwrap_y;
+    double unwrap_z;
+    
+    Metal() {
+        ID = -1;
+        x_coords = y_coords = z_coords = -1.0;
+    }
+};
+typedef std::vector<Metal> M_vector;
 
 struct Hydrogen {
     int ID;
@@ -78,6 +95,7 @@ typedef std::vector<Oxygen> O_vector;
 struct TimeStep {
     O_vector O_atoms;
     H_vector H_atoms;
+    M_vector M_atoms;
 };
 
 typedef std::vector<TimeStep> TimeSteps;

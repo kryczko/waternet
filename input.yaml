@@ -3,7 +3,7 @@ lattice_constants:
     x: 11.24
     y: 9.747
     z: 45.687
-# enter the number of oxygen and hydrogen atoms
+# enter the number of oxygen, hydrogen, and metal atoms
 n_atoms:
     O: 100
     H: 200
@@ -17,36 +17,36 @@ modules:
     create_edgelist: true    
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
     num_cell_blocks: 5
-    cell_block_start: 0
-    cell_block_end: 45.687
+    cell_block_start: 13.0
+    cell_block_end: 45.0
     
     # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
     fix_plots: true
     starting_z: 5.0
     
     # create a graph xml file 
-    output_gephi: false
+    output_gephi: true 
     
     # create a data file to plot the degree along the z-axis
-    degree_z: false
+    degree_z: true
     degree_bins: 500
     
     # create a data file to plot neighboring O-O distance distribution
-    OOdistro: false
+    OOdistro: true
     OO_bins: 1000
     OO_max_dist: 5.0
     
     # create a data file to plot local O-H distance distribution
-    OHdistro: false
+    OHdistro: true
     OH_bins: 1000
     OH_max_dist: 2.0
     
     # create a data file to plot local H-O-H angle distribution
-    HOHdistro: false
+    HOHdistro: true
     HOH_bins: 1000
     
     # create a data file for the cumulative degree distribution (coordination number)
-    degree_distro: false
+    degree_distro: true
     
     # create data files for each coordinate (x, y, and z) with density profiles
     density: true
@@ -54,7 +54,7 @@ modules:
     heavy_water: true
         
     # create data file for mean square displacement
-    mean_square_displacement: false
+    mean_square_displacement: true
     time_step: 0.2737  # in femtoseconds - 0.1935 H2O - 0.2737 D2O -
     num_blocks: 50 # number of starting configurations
     # if false, the msd will be calculated for a short period of time = num_timesteps / num_blocks
@@ -79,8 +79,8 @@ modules:
     
     # create a contour plotable file for the spacial distribution function
     spacial_distribution_function: false
-    sdf_z_start: 15.0 # best to make this where your metal is
-    sdf_z_end: 20 # best to analyze the density profile and set this value accordingly
+    sdf_z_start: 13.0 # best to make this where your metal is
+    sdf_z_end: 21 # best to analyze the density profile and set this value accordingly
     sdf_bins: 20 # number of bins for atom binning
     
     # run analysis that calculates the time between water molecules switch partners
@@ -96,7 +96,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_330.xyz      #
+    input: xyzfiles/platinum/pt_water_400.xyz      #
     #                                       #   
     #########################################
     

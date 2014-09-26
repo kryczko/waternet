@@ -14,6 +14,7 @@ struct Args {
     Information arg_info;
     TimeStep arg_time_step;
     TimeSteps arg_time_steps;
+    double avg_left, avg_right;
 };
 
 int num_edges(O_vector& Ovec) {
@@ -26,7 +27,7 @@ int num_edges(O_vector& Ovec) {
     return count;
 }
 
-void *output_graphfile(Args& args) {
+void output_graphfile(Args& args) {
     Information& info = args.arg_info;
     TimeStep& time_step = args.arg_time_step;
     
@@ -69,7 +70,7 @@ void *output_graphfile(Args& args) {
     
 }
 
-void * degree_respect_z(Args& args) {
+void  degree_respect_z(Args& args) {
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
     
@@ -152,7 +153,7 @@ void out_count(Information& info, TimeSteps& time_steps) {
     }
 }
 
-void * OOdistro(Args& args) {
+void  OOdistro(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -190,7 +191,7 @@ void * OOdistro(Args& args) {
     
 }
 
-void *OHdistro(Args& args) {
+void OHdistro(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -254,7 +255,7 @@ double HOHangle(Oxygen& O, Hydrogen& H1, Hydrogen& H2, Information& info) {
     return angle;
 }
 
-void * HOHdistro(Args& args) {
+void  HOHdistro(Args& args) {
     // 360 degrees, bin for each degree
     ;
     Information& info = args.arg_info;
@@ -297,7 +298,7 @@ void * HOHdistro(Args& args) {
     
 }
 
-void * degree_distro(Args& args) {
+void  degree_distro(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -386,7 +387,7 @@ void create_symmetry_density(vector<double>& dens, vector<double>& pos) {
     output.close();
 }
 
-void * density(Args& args) {
+void  density(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -686,7 +687,7 @@ typedef std::vector<MsdStep> msd_vec;
 
 msd_vec msd_vector;
 
-void * msd(Args& args) {
+void  msd(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -862,7 +863,7 @@ void * msd(Args& args) {
     
 }
 
-void *orientation_1D(Args& args) {
+void orientation_1D(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -929,7 +930,7 @@ void *orientation_1D(Args& args) {
     cout << "Outputted 1D orientation data files.\n\n";
 }
 
-void* orientation(Args& args) {
+void orientation(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -1063,7 +1064,7 @@ void* orientation(Args& args) {
     
     
 }
-void* sdf(Args& args) {
+void sdf(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -1137,7 +1138,7 @@ vector<int> set_zero(vector<int>& vec) {
     return vec;
 }
 
-void* nrt(Args& args) {
+void nrt(Args& args) {
     
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
@@ -1215,7 +1216,7 @@ double average(vector<double>& vec) {
     return sum / vec.size(); 
 }
 
-void * vel_check(Args& args) {
+void  vel_check(Args& args) {
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
     VHelp_Vector vhelper(time_steps.size() - 1);
@@ -1324,17 +1325,22 @@ double min(double x, double y) {
     return y;
 }
 
-void * zdens_from_metal(Args& args) {
+void  zdens_from_metal(Args& args) {
         Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
     double average_left = metals_avg_left(time_steps);
     double average_right = metals_avg_right(time_steps, info);
+    args.avg_left = average_left;
+    args.avg_right = average_right;
     double metal_dist = average_right - average_left;
     double water_z_dist = info.lattice_z - metal_dist;
-    
-    vector<int> zbins(info.density_bins), O_zbins(info.density_bins), H_zbins(info.density_bins);
-    double zinc = 0.5 * water_z_dist / info.density_bins;
-    
+    vector<int> zbins(info.density_bins/2), O_zbins(info.density_bins/2), H_zbins(info.density_bins);
+    for (int i = 0; i < info.density_bins/2; i ++) {
+        zbins[i] = 0;
+        O_zbins[i] = 0;
+        H_zbins[i] = 0;
+    }
+    double zinc = 0.5 * water_z_dist / (info.density_bins /2);
     double conversion, O_conversion = 1, H_conversion;
     if (info.heavy_water) {
         H_conversion = 2;
@@ -1363,10 +1369,53 @@ void * zdens_from_metal(Args& args) {
             H_zbins[zbin] ++;
         }
     }
-    for (int i = 0; i < info.density_bins; i ++) {
-        zoutput << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";
-        zoutput << i*zinc + zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";   
+    for (int i = 0; i < info.density_bins /2; i ++) {
+        zoutput << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
     }
+    zoutput.close();
+    cout << "Outputted density with respect to metal data file.\n\n";
+}
+
+void  degree_respect_metal(Args& args) {
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
+    double average_l = args.avg_left;
+    double average_r = args.avg_right;
+    double metal_d = average_r - average_l;
+    double water_z_d = info.lattice_z - metal_d;
+    ofstream output;
+    output.open("output/degree_wrt_metal.dat");
+    int n_bins = info.degree_bins / 2;
+    double zinc = 0.5 * water_z_d / (info.degree_bins / 2);
+    vector<int> bincounts ( n_bins ), counts ( n_bins );
+    vector<double> degrees ( n_bins );
+    for (int i = 0; i < n_bins; i ++) {
+        bincounts[i] = 0;
+        counts[i] = 0;
+        degrees[i] = 0;
+    }
+    int total_counts = 0;
+    for (int i = 0; i < time_steps.size(); i ++) {
+        O_vector& Ovec = time_steps[i].O_atoms;
+        for (int j = 0; j < Ovec.size(); j ++) {
+            Oxygen& O = Ovec[j];
+            int degree = O.bonded_O_neighbors.size() + O.out_degree;
+            double z = min(abs(O.z_coords - average_l), abs(O.z_coords - average_r));
+            int bin = z / zinc;
+            degrees[bin] += degree;
+            counts[bin] ++;
+        }
+    }
+    for (int i = 0; i < info.degree_bins/2; i ++) {
+        if (counts[i]) {
+            output << i*zinc << "\t" << degrees[i] / counts[i] << "\n";
+        } else {
+            output << i*zinc << "\t" << 0 << "\n";
+        }
+    }
+    cout << "Outputted degree with respect to metal data file.\n\n";
+    
+    output.close();
 }
 
 bool output_edgelist(Information& info, TimeSteps& time_steps) {
@@ -1392,11 +1441,11 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
    
     //THIS IS FOR OPENMP
      // vector of function pointers
-    vector<void * (*)(Args&)> vec_fp;
+    vector<void(*)(Args&)> vec_fp;
     // vector of decisions if functions are called
     vector<bool> dec;
     
-    void *(*fpointer)(Args&);
+    void (*fpointer)(Args&);
     
     
     fpointer = output_graphfile;
@@ -1453,9 +1502,11 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     
     fpointer = zdens_from_metal;
     vec_fp.push_back(fpointer);
+    dec.push_back(false);
+    
+    fpointer = degree_respect_metal;
+    vec_fp.push_back(fpointer);
     dec.push_back(true);
-    
-    
     /*if (info.output_gephi) {
         output_graphfile(info, time_steps[time_steps.size() - 1]);
         cout << "Gephi graph file created.\n\n";
@@ -1510,9 +1561,9 @@ bool output_edgelist(Information& info, TimeSteps& time_steps) {
     args.arg_time_steps = time_steps;
     
     // OPENMP parallelization
-    omp_set_dynamic(0);
-    omp_set_num_threads(info.num_threads);
-    #pragma omp parallel for 
+    //omp_set_dynamic(0);
+    //omp_set_num_threads(info.num_threads);
+    //#pragma omp parallel for 
     for (int i = 0; i < vec_fp.size(); i ++) {  
         if (dec[i]) {
             vec_fp[i](args);

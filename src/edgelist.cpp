@@ -155,11 +155,11 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
     //pthread_t threads[info.num_threads];
     // OPENMP parallelization
     int chunk = time_steps.size() / info.num_threads;
-    omp_set_dynamic(0);
-    omp_set_num_threads(info.num_threads);
+    //omp_set_dynamic(0);
+    //omp_set_num_threads(info.num_threads);
     int begin, end;
     
-    #pragma omp parallel for 
+    //#pragma omp parallel for 
     for (int i = 0; i < info.num_threads; i ++) {
         begin = i*chunk;
         if ((i+1)*chunk > time_steps.size()){

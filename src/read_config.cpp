@@ -106,3 +106,4 @@ bool read_configfile(Information& info) {
     cout << "Configuration file \"input.yaml\" read.\n\n";
     return true;
 }
+

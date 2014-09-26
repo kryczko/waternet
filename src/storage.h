@@ -100,5 +100,12 @@ struct TimeStep {
 
 typedef std::vector<TimeStep> TimeSteps;
 
+struct Args {
+    Information arg_info;
+    TimeStep arg_time_step;
+    TimeSteps arg_time_steps;
+    double avg_left, avg_right;
+};
+
 #endif
 

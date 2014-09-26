@@ -64,7 +64,7 @@ bool read_datafile(Information& info, TimeSteps& time_steps) {
             M.name = info.metal;
             input >> M.x_coords >> M.y_coords >> M.z_coords;
             n_met ++;
-        } else if (n_hyd == info.num_hydrogen && n_oxy == info.num_oxygen && n_met == info.num_metals) {
+        } else if (n_hyd == info.num_hydrogen && n_oxy == info.num_oxygen && n_met == info.num_metals ) {
             steps ++;
             n_hyd = 0;
             n_oxy = 0;
@@ -74,3 +74,4 @@ bool read_datafile(Information& info, TimeSteps& time_steps) {
     cout << "Read data file...\n\n";
     return true;
 }
+

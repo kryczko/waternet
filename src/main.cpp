@@ -8,15 +8,13 @@
 #include "read_config.h"
 #include "read_data.h"
 #include "edgelist.h"
-#include "output.h"
-#include "dynamics.h"
+#include "analysis.h"
 
 using namespace std;
 
 // declaration of data structures
 Information info;
 TimeSteps time_steps;
-H_group_info hgi;
 
 void print_welcome_message() {
     cout << "\033[1;46m\033[1;37m\n\n";
@@ -46,14 +44,10 @@ int main() {
     if (!create_edgelist(info, time_steps)) {
         cout << "Error creating edgelists, some modules will fail...\n\n";
     }
-    if (!output_edgelist(info, time_steps)) {
-        cout << "Error outputting edgelists, exiting...\n\n";
+    if (!main_analysis(info, time_steps)) {
+        cout << "Error running analysis, exiting...\n\n";
         return 0;
     } 
-    if (!main_dynamics_func(info, time_steps, hgi)) {
-        cout << "Error with dynamics, exiting...\n\n";
-        return 0;
-    }
     cout << "\033[0m";
     return 0;
 }

@@ -29,7 +29,7 @@ modules:
     
     # create a data file to plot the degree along the z-axis
     degree_z: true
-    degree_bins: 500
+    degree_bins: 250
     
     # create a data file to plot neighboring O-O distance distribution
     OOdistro: true

@@ -4,72 +4,9 @@
 #include <thread>
 #include <pthread.h>
 #include "storage.h"
-#include "omp.h"
-
+#include "helper.h"
 using namespace std;
 
-int pbc_round(double input) {
-	int i  = input;
-
-	if (abs(input - i) >= 0.5) {
-		if (input > 0) {i += 1;}
-		if (input < 0) {i -= 1;}
-	}
-return i;
-}
-
-double OOdist(Oxygen& O1, Oxygen& O2, Information& info) {
-    double dx = O1.x_coords - O2.x_coords;
-    double dy = O1.y_coords - O2.y_coords;
-    double dz = O1.z_coords - O2.z_coords;
-    
-    dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
-    dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
-    dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
-    
-    double dist = sqrt(dx*dx + dy*dy + dz*dz);
-    return dist;
-}
-
-double OHdist(Oxygen& O, Hydrogen& H, Information& info) {
-    double dx = O.x_coords - H.x_coords;
-    double dy = O.y_coords - H.y_coords;
-    double dz = O.z_coords - H.z_coords;
-    
-    dx -= info.lattice_x * pbc_round(dx/info.lattice_x);
-    dy -= info.lattice_y * pbc_round(dy/info.lattice_y);
-    dz -= info.lattice_z * pbc_round(dz/info.lattice_z);
-    
-    double dist = sqrt(dx*dx + dy*dy + dz*dz);
-    return dist;
-}
-
-// radians to degrees
-const double rtd = 57.2957795;
-
-double angle_between(Oxygen& O1, Oxygen& O2, Hydrogen& H, Information& info) {
-    double odx = O2.x_coords - O1.x_coords;
-    double ody = O2.y_coords - O1.y_coords;
-    double odz = O2.z_coords - O1.z_coords;
-    double hdx = H.x_coords - O1.x_coords;
-    double hdy = H.y_coords - O1.y_coords;
-    double hdz = H.z_coords - O1.z_coords;
-    
-    odx -= info.lattice_x * pbc_round(odx/info.lattice_x);
-    ody -= info.lattice_y * pbc_round(ody/info.lattice_y);
-    odz -= info.lattice_z * pbc_round(odz/info.lattice_z);
-    hdx -= info.lattice_x * pbc_round(hdx/info.lattice_x);
-    hdy -= info.lattice_y * pbc_round(hdy/info.lattice_y);
-    hdz -= info.lattice_z * pbc_round(hdz/info.lattice_z);
-    
-    double oodist = OOdist(O1, O2, info);
-    double ohdist = OHdist(O1, H, info);
-    
-    double dot = odx*hdx + ody*hdy + odz*hdz;
-    double angle = acos( dot / ( oodist*ohdist )) * rtd;
-    
-    return angle;
-}
 
 void nearest_neighbors(Information& info, Oxygen& O, O_vector& Ovec) {
     for (int i = 0; i < Ovec.size(); i ++) {
@@ -207,3 +144,4 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
     cout << "Computed nearest neighbour lists...\n\n";    
     return true;
 }
+

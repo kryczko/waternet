@@ -43,6 +43,8 @@ void  OOdistro(Args& args) {
         output << i*binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
         output << i*binsize + binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
     }
+    cout << "Outputted OO distribution data file.\n\n";
+    
     output.close();
     
     

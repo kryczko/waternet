@@ -43,7 +43,7 @@ void OHdistro(Args& args) {
         output << i*binsize + binsize << "\t" << bins[i] / (double) counter << "\t" << sum / counter << "\n";
     }
     output.close();
-    cout << "Outputted OO distribution data file.\n\n";
+    cout << "Outputted OH distribution data file.\n\n";
     
     
 }

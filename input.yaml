@@ -96,7 +96,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_400.xyz      #
+    input: xyzfiles/platinum/pt_water_330.xyz      #
     #                                       #   
     #########################################
     

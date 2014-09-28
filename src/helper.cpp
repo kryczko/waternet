@@ -28,7 +28,7 @@ double metals_avg_left(TimeSteps& time_steps, Information& info) {
     double sum = 0;
     double counter = 0;
     for (int i = 0; i < time_steps.size(); i ++) {
-        double min_m = find_min_m(time_steps[i].M_atoms);
+        double min_m = find_min_m(time_steps[i].M_atoms,info);
         for (auto& M : time_steps[i].M_atoms) {
             if (abs(M.z_coords - min_m) < 1.0) {
                 sum += M.z_coords;

@@ -79,7 +79,7 @@ modules:
     OH_group_dynamics: false
     
     # create a contour plotable file for the spacial distribution function
-    spacial_distribution_function: false
+    spacial_distribution_function: true
     sdf_z_start: 13.0 # best to make this where your metal is
     sdf_z_end: 21 # best to analyze the density profile and set this value accordingly
     sdf_bins: 20 # number of bins for atom binning
@@ -97,7 +97,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_400.xyz      #
+    input: xyzfiles/platinum/pt_water_330.xyz      #
     #                                       #   
     #########################################
     

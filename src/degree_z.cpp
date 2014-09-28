@@ -12,8 +12,8 @@
 using namespace std;
 
 void  degree_respect_metal(Args& args) {
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     double average_l = metals_avg_left(time_steps);
     double average_r = metals_avg_right(time_steps, info);
     double metal_d = average_r - average_l;
@@ -21,7 +21,7 @@ void  degree_respect_metal(Args& args) {
     ofstream output;
     output.open("output/degree_wrt_metal.dat");
     int n_bins = info.degree_bins / 2;
-    double zinc = 0.5 * water_z_d / (info.degree_bins / 2);
+    double zinc = 0.5 * water_z_d / (n_bins);
     vector<int> bincounts ( n_bins ), counts ( n_bins );
     vector<double> degrees ( n_bins );
     for (int i = 0; i < n_bins; i ++) {
@@ -41,7 +41,7 @@ void  degree_respect_metal(Args& args) {
             counts[bin] ++;
         }
     }
-    for (int i = 0; i < info.degree_bins/2; i ++) {
+    for (int i = 0; i < n_bins; i ++) {
         if (counts[i]) {
             output << i*zinc << "\t" << degrees[i] / counts[i] << "\n";
         } else {

@@ -22,9 +22,9 @@ void out_count(Information& info, TimeSteps& time_steps);
 double wrap(double value, double lattice);
 void remove_zeros(vector<double>& dens, vector<double>& pos);
 double find_max_m(M_vector& M_atoms, Information& info);
-double find_min_m(M_vector& M_atoms);
+double find_min_m(M_vector& M_atoms, Information& info);
 double min(double x, double y);
 void unwrap(Information& info, TimeSteps& time_steps);
 double metals_avg_right(TimeSteps& time_steps, Information& info);
-double metals_avg_left(TimeSteps& time_steps);
+double metals_avg_left(TimeSteps& time_steps, Information& info);
 #endif

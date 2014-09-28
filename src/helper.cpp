@@ -24,7 +24,7 @@ double metals_avg_right(TimeSteps& time_steps, Information& info) {
     return sum / counter;
 } 
 
-double metals_avg_left(TimeSteps& time_steps) {
+double metals_avg_left(TimeSteps& time_steps, Information& info) {
     double sum = 0;
     double counter = 0;
     for (int i = 0; i < time_steps.size(); i ++) {
@@ -182,7 +182,7 @@ double find_max_m(M_vector& M_atoms, Information& info) {
 }
 
 double find_min_m(M_vector& M_atoms, Information& info) {
-    double val = M_atoms[0]; // some large value
+    double val = M_atoms[0].z_coords; // some large value
     double dummy;
     for (auto& M : M_atoms) {
         if (M.z_coords < 5.0) {

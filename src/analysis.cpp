@@ -70,7 +70,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     if (info.network_reorganization_time) {
         nrt(args);
     }
-    args.avg_left = metals_avg_left(time_steps);
+    args.avg_left = metals_avg_left(time_steps, info);
     args.avg_right = metals_avg_right(time_steps, info);
     degree_respect_metal(args);
     

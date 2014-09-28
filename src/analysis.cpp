@@ -71,7 +71,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     
     zdens_from_metal(args);
-    degree_respect_metal(args);
+    degree_respect_metal(info, time_steps);
     
     
 

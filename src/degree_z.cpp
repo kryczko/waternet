@@ -11,9 +11,7 @@
 
 using namespace std;
 
-void  degree_respect_metal(Args& args) {
-    Information& info = args.arg_info;
-    TimeSteps& time_steps = args.arg_time_steps;
+void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
     double average_l = metals_avg_left(time_steps);
     double average_r = metals_avg_right(time_steps, info);
     double metal_d = average_r - average_l;

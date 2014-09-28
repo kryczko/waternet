@@ -52,7 +52,7 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
     }
     cout << "Outputted degree with respect to metal data file.\n\n";
     
-    output.close();
+   // output.close();
 }
 
 void  degree_respect_z(Args& args) {

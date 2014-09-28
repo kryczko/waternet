@@ -72,7 +72,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     
     cout << "here1\n";
-    //degree_respect_metal(info, time_steps);
+    degree_respect_metal(info, time_steps);
     
     
 

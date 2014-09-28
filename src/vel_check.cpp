@@ -13,8 +13,8 @@ using namespace std;
 
 
 void  vel_check(Args& args) {
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     VHelp_Vector vhelper(time_steps.size() - 1);
     for (int i = 1; i < time_steps.size(); i ++) {
         O_vector& Ovec_then = time_steps[i].O_atoms;

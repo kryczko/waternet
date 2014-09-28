@@ -45,8 +45,8 @@ double metals_avg_left(TimeSteps& time_steps) {
 
 
 void  zdens_from_metal(Args& args) {
-        Information info = args.arg_info;
-    TimeSteps&time_steps = args.arg_time_steps;
+        Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     double average_left = metals_avg_left(time_steps);
     double average_right = metals_avg_right(time_steps, info);
     args.avg_left = average_left;

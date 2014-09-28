@@ -35,8 +35,8 @@ double HOHangle(Oxygen& O, Hydrogen& H1, Hydrogen& H2, Information& info) {
 
 void  HOHdistro(Args& args) {
     // 360 degrees, bin for each degree
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> bins ( info.HOH_bins );
     double binsize = 360.0 / info.HOH_bins;

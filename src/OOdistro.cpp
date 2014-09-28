@@ -12,8 +12,8 @@ using namespace std;
 
 void  OOdistro(Args& args) {
     
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> bins ( info.OO_bins );
     int counter = 0;

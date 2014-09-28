@@ -13,8 +13,8 @@ using namespace std;
 
 void nrt(Args& args) {
     
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     vector<int> time_counter;
     

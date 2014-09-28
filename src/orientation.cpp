@@ -13,8 +13,8 @@ using namespace std;
 
 void orientation_1D(Args& args) {
     
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;
     for (int cell = 0; cell < info.num_cell_blocks; cell ++) {

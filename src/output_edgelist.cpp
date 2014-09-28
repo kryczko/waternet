@@ -12,8 +12,8 @@ using namespace std;
 
 
 void output_edgelist(Args& args) {
-    Information info = args.arg_info;
-    TimeSteps time_steps = args.arg_time_steps;
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
     if (info.create_edgelist) {
         ofstream output;
         output.open(info.edgelist_output_filename.c_str());

@@ -12,8 +12,8 @@ using namespace std;
 
 
 void output_graphfile(Args& args) {
-    Information info = args.arg_info;
-    TimeStep time_step = args.arg_time_step;
+    Information& info = args.arg_info;
+    TimeStep& time_step = args.arg_time_step;
     
     O_vector& Ovec = time_step.O_atoms;
     int n_bins = info.num_cell_blocks;

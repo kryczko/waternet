@@ -1,6 +1,7 @@
 #include "storage.h"
 #include "analysis.h"
 #include "helper.h"
+#include "density.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -13,8 +14,8 @@ using namespace std;
 void  degree_respect_metal(Args& args) {
     Information info = args.arg_info;
     TimeSteps time_steps = args.arg_time_steps;
-    double average_l = args.avg_left;
-    double average_r = args.avg_right;
+    double average_l = metals_avg_left(time_steps);
+    double average_r = metals_avg_right(time_steps, info);
     double metal_d = average_r - average_l;
     double water_z_d = info.lattice_z - metal_d;
     ofstream output;

@@ -53,6 +53,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     if (info.density) {
         density(args);
+        zdens_from_metal(info, time_steps);
     }
     if (info.msd) {
         msd(args);
@@ -70,7 +71,6 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
         nrt(args);
     }
     
-    zdens_from_metal(info, time_steps);
     cout << "here1\n";
     //degree_respect_metal(info, time_steps);
     

@@ -72,7 +72,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     args.avg_left = metals_avg_left(time_steps);
     args.avg_right = metals_avg_right(time_steps, info);
-    degree_respect_metal(info, time_steps);
+    degree_respect_metal(args);
     
     
 

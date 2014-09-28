@@ -171,8 +171,8 @@ double find_max_m(M_vector& M_atoms, Information& info) {
     double val = 0;
     double dummy;
     for (auto& M : M_atoms) {
-        if (info.lattice_z - M.z_coords < 1 ) {
-            dummy = M.z_coords - info.lattice_z;
+        if (M.z_coords < 5.0 ) {
+            dummy = M.z_coords + info.lattice_z;
         }
         if (dummy > val) {
             val = dummy;
@@ -181,11 +181,15 @@ double find_max_m(M_vector& M_atoms, Information& info) {
     return val;
 }
 
-double find_min_m(M_vector& M_atoms) {
-    double val = 100.0; // some large value
+double find_min_m(M_vector& M_atoms, Information& info) {
+    double val = M_atoms[0]; // some large value
+    double dummy;
     for (auto& M : M_atoms) {
-        if (M.z_coords < val) {
-            val = M.z_coords;
+        if (M.z_coords < 5.0) {
+            dummy = M.z_coords + info.lattice_z;
+        } 
+        if (dummy < val) {
+            val = dummy;
         }
     }
     return val;

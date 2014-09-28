@@ -11,10 +11,10 @@
 using namespace std;
 
 void  degree_respect_metal(Args& args) {
-    Information& info = args.arg_info;
-    TimeSteps& time_steps = args.arg_time_steps;
-    double& average_l = args.avg_left;
-    double& average_r = args.avg_right;
+    Information info = args.arg_info;
+    TimeSteps time_steps = args.arg_time_steps;
+    double average_l = args.avg_left;
+    double average_r = args.avg_right;
     double metal_d = average_r - average_l;
     double water_z_d = info.lattice_z - metal_d;
     ofstream output;

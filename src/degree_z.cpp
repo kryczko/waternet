@@ -12,6 +12,7 @@
 using namespace std;
 
 void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
+    cout << "got here\n";
     double average_l = metals_avg_left(time_steps);
     double average_r = metals_avg_right(time_steps, info);
     double metal_d = average_r - average_l;

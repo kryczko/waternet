@@ -11,8 +11,8 @@
 using namespace std;
 
 void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
-    double average_left = metals_avg_left(time_steps);
-    double average_right = metals_avg_right(time_steps, info);
+    double average_left = 0;//metals_avg_left(time_steps);
+    double average_right = 45; //metals_avg_right(time_steps, info);
     double metal_dist = average_right - average_left;
     double water_z_dist = info.lattice_z - metal_dist;
     int nbins = info.density_bins/2;
@@ -57,7 +57,7 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
     }
     
     cout << "got here\n";
-    //zoutput.close();
+    zoutput.close();
     cout << "Outputted density with respect to metal data file.\n\n";
 }
 

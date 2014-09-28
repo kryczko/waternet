@@ -25,4 +25,6 @@ double find_max_m(M_vector& M_atoms, Information& info);
 double find_min_m(M_vector& M_atoms);
 double min(double x, double y);
 void unwrap(Information& info, TimeSteps& time_steps);
+double metals_avg_right(TimeSteps& time_steps, Information& info);
+double metals_avg_left(TimeSteps& time_steps);
 #endif

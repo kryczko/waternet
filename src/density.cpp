@@ -10,40 +10,6 @@
 
 using namespace std;
 
-double metals_avg_right(TimeSteps& time_steps, Information& info) {
-    double sum = 0;
-    double counter = 0;
-    for (int i = 0; i < time_steps.size(); i ++) {
-        double max_m = find_max_m(time_steps[i].M_atoms, info);
-        for (auto& M : time_steps[i].M_atoms) {
-            if (abs(M.z_coords - max_m) < 1.0) {
-                sum += M.z_coords;
-                counter += 1;
-            }
-        }
-    }
-    
-    return sum / counter;
-} 
-
-double metals_avg_left(TimeSteps& time_steps) {
-    double sum = 0;
-    double counter = 0;
-    for (int i = 0; i < time_steps.size(); i ++) {
-        double min_m = find_min_m(time_steps[i].M_atoms);
-        for (auto& M : time_steps[i].M_atoms) {
-            if (abs(M.z_coords - min_m) < 1.0) {
-                sum += M.z_coords;
-                counter += 1;
-            }
-        }
-    }
-    
-    return sum / counter;
-} 
-
-
-
 void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
     double average_left = metals_avg_left(time_steps);
     double average_right = metals_avg_right(time_steps, info);

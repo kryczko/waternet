@@ -32,9 +32,9 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
         conversion = 18.0e-6/(6.023e23*1.0e-30);
     }
     double zvol = info.lattice_x*info.lattice_y*zinc;
-    ofstream zoutput;
+    ofstream output;
     string filename = "output/dens_from_metal.dat";
-    zoutput.open(filename.c_str());
+    output.open(filename.c_str());
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
@@ -53,11 +53,11 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
         }
     }
     for (int i = 0; i < nbins; i ++) {
-        zoutput << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
+        output << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
     }
     
     cout << "got here\n";
-    zoutput.close();
+    output.close();
     cout << "Outputted density with respect to metal data file.\n\n";
 }
 

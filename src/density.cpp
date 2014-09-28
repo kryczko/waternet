@@ -51,13 +51,14 @@ void  zdens_from_metal(Args& args) {
     double average_right = metals_avg_right(time_steps, info);
     double metal_dist = average_right - average_left;
     double water_z_dist = info.lattice_z - metal_dist;
-    vector<int> zbins(info.density_bins/2), O_zbins(info.density_bins/2), H_zbins(info.density_bins);
-    for (int i = 0; i < info.density_bins/2; i ++) {
+    int nbins = info.density_bins/2;
+    vector<int> zbins(nbins), O_zbins(nbins), H_zbins(nbins);
+    for (int i = 0; i < nbins; i ++) {
         zbins[i] = 0;
         O_zbins[i] = 0;
         H_zbins[i] = 0;
     }
-    double zinc = 0.5 * water_z_dist / (info.density_bins /2);
+    double zinc = 0.5 * water_z_dist / (nbins);
     double conversion, O_conversion = 1, H_conversion;
     if (info.heavy_water) {
         H_conversion = 2;
@@ -86,7 +87,7 @@ void  zdens_from_metal(Args& args) {
             H_zbins[zbin] ++;
         }
     }
-    for (int i = 0; i < info.density_bins /2; i ++) {
+    for (int i = 0; i < nbins; i ++) {
         zoutput << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
     }
     zoutput.close();

@@ -49,8 +49,6 @@ void  zdens_from_metal(Args& args) {
     TimeSteps& time_steps = args.arg_time_steps;
     double average_left = metals_avg_left(time_steps);
     double average_right = metals_avg_right(time_steps, info);
-    args.avg_left = average_left;
-    args.avg_right = average_right;
     double metal_dist = average_right - average_left;
     double water_z_dist = info.lattice_z - metal_dist;
     vector<int> zbins(info.density_bins/2), O_zbins(info.density_bins/2), H_zbins(info.density_bins);

@@ -10,11 +10,13 @@
 
 using namespace std;
 
-void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
-    double average_left = 0;//metals_avg_left(time_steps);
-    double average_right = 45; //metals_avg_right(time_steps, info);
-    double metal_dist = average_right - average_left;
-    double water_z_dist = info.lattice_z - metal_dist;
+void  zdens_from_metal(Args& args) {
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
+    double average_left = args.avg_left + info.lattice_z;
+    double average_right = args.avg_right;
+    double metal_dist = average_right - (average_left - info.lattice_z);
+    double water_z_dist = abs(info.lattice_z - metal_dist);
     int nbins = info.density_bins/2;
     vector<int> zbins(nbins), O_zbins(nbins), H_zbins(nbins);
     for (int i = 0; i < nbins; i ++) {
@@ -40,7 +42,9 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
         H_vector& Hvec = time_steps[i].H_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
-            double z = min(abs(O.z_coords - average_left), abs(O.z_coords - average_right));
+            double dist1 = abs(O.z_coords - average_left);
+            double dist2 = abs(O.z_coords - average_right);
+            double z = min(dist1, dist2);
             int zbin = z / zinc;
             zbins[zbin] ++;
             O_zbins[zbin] ++;
@@ -53,7 +57,7 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
         }
     }
     for (int i = 0; i < nbins; i ++) {
-        output << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
+        output << i*zinc << "\t" << zbins[i]*conversion / (2*zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (2*zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (2*zvol*info.n_frames) << "\n";  
     }
     output.close();
     cout << "Outputted density with respect to metal data file.\n\n";

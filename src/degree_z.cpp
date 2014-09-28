@@ -13,11 +13,10 @@ using namespace std;
 void  degree_respect_metal(Args& args) {
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
-    double average_l = args.avg_left;
+    double average_l = args.avg_left + info.lattice_z;
     double average_r = args.avg_right;
-    cout << average_l << "\t" << average_r << "\n";
-    double metal_d = average_r - average_l;
-    double water_z_d = info.lattice_z - metal_d;
+    double metal_d = average_r - (average_l - info.lattice_z);
+    double water_z_d = abs(info.lattice_z - metal_d);
     ofstream output;
     string filename = "output/degree_wrt_metal.dat";
     output.open(filename.c_str());
@@ -37,7 +36,9 @@ void  degree_respect_metal(Args& args) {
         for (int j = 0; j < Ovec.size(); j ++) {
             Oxygen& O = Ovec[j];
             int degree = O.bonded_O_neighbors.size() + O.out_degree;
-            double z = min(abs(O.z_coords - average_l), abs(O.z_coords - average_r));
+            double dist1 = abs(O.z_coords - average_l);
+            double dist2 = abs(O.z_coords - average_r);
+            double z = min(dist1, dist2);
             int bin = z / zinc;
             degrees[bin] += degree;
             counts[bin] ++;

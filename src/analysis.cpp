@@ -53,7 +53,6 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     if (info.density) {
         density(args);
-        //zdens_from_metal(info, time_steps);
     }
     if (info.msd) {
         msd(args);
@@ -73,6 +72,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     args.avg_left = metals_avg_left(time_steps, info);
     args.avg_right = metals_avg_right(time_steps, info);
     degree_respect_metal(args);
+    zdens_from_metal(args);
     
     
 

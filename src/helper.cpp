@@ -13,9 +13,15 @@ double metals_avg_right(TimeSteps& time_steps, Information& info) {
     double counter = 0;
     for (int i = 0; i < time_steps.size(); i ++) {
         double max_m = find_max_m(time_steps[i].M_atoms, info);
+        double dummy;
         for (auto& M : time_steps[i].M_atoms) {
-            if (abs(M.z_coords - max_m) < 1.0) {
-                sum += M.z_coords;
+            if (M.z_coords > 0.75*info.lattice_z) {
+                dummy = M.z_coords - info.lattice_z;
+            } else {
+                 dummy = M.z_coords;
+            }
+            if (abs(dummy - max_m) < 1.0) {
+                sum += dummy;
                 counter += 1;
             }
         }
@@ -29,9 +35,15 @@ double metals_avg_left(TimeSteps& time_steps, Information& info) {
     double counter = 0;
     for (int i = 0; i < time_steps.size(); i ++) {
         double min_m = find_min_m(time_steps[i].M_atoms,info);
+        double dummy;
         for (auto& M : time_steps[i].M_atoms) {
-            if (abs(M.z_coords - min_m) < 1.0) {
-                sum += M.z_coords;
+            if (M.z_coords > 0.75*info.lattice_z) {
+                dummy = M.z_coords - info.lattice_z;
+            } else {
+                 dummy = M.z_coords;
+            }
+            if (abs(dummy - min_m) < 1.0) {
+                sum += dummy;
                 counter += 1;
             }
         }
@@ -171,8 +183,10 @@ double find_max_m(M_vector& M_atoms, Information& info) {
     double val = 0;
     double dummy;
     for (auto& M : M_atoms) {
-        if (M.z_coords < 5.0 ) {
-            dummy = M.z_coords + info.lattice_z;
+        if (M.z_coords > 0.75*info.lattice_z ) {
+            dummy = M.z_coords - info.lattice_z;
+        } else {
+            dummy = M.z_coords;
         }
         if (dummy > val) {
             val = dummy;
@@ -185,9 +199,11 @@ double find_min_m(M_vector& M_atoms, Information& info) {
     double val = 500; // some large value
     double dummy;
     for (auto& M : M_atoms) {
-        if (M.z_coords < 5.0) {
-            dummy = M.z_coords + info.lattice_z;
-        } 
+        if (M.z_coords > 0.75*info.lattice_z) {
+            dummy = M.z_coords - info.lattice_z;
+        } else {
+            dummy = M.z_coords;
+        }
         if (dummy < val) {
             val = dummy;
         }

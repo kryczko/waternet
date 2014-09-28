@@ -3,7 +3,7 @@
 lattice_constants:
     x: 11.24
     y: 9.747
-    z: 45.687   
+    z: 41.098  
 # enter the number of oxygen, hydrogen, and metal atoms
 n_atoms:
     O: 100
@@ -79,7 +79,7 @@ modules:
     OH_group_dynamics: false
     
     # create a contour plotable file for the spacial distribution function
-    spacial_distribution_function: true
+    spacial_distribution_function: false
     sdf_z_start: 13.0 # best to make this where your metal is
     sdf_z_end: 21 # best to analyze the density profile and set this value accordingly
     sdf_bins: 20 # number of bins for atom binning
@@ -88,7 +88,7 @@ modules:
     # the plot outputted is the probability after some time (in ps) that you would
     # find a water molecule with the same partner
     # NOTE - for averaging purposes the num_starts is used here
-    network_reorganization_time: false
+    network_reorganization_time: true
     num_starts: 1000
     time_length: 3654 # - 0.1935: 1 ps = 5168 steps, - 0.2737: 1 ps = 3654 steps  ---- in timesteps, the function will average over this
     
@@ -97,7 +97,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_400.xyz      #
+    input: xyzfiles/platinum/pt_water_highp_330.xyz      #
     #                                       #   
     #########################################
     

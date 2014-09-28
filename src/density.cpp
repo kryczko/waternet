@@ -55,8 +55,6 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
     for (int i = 0; i < nbins; i ++) {
         output << i*zinc << "\t" << zbins[i]*conversion / (zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (zvol*info.n_frames) << "\n";  
     }
-    
-    cout << "got here\n";
     output.close();
     cout << "Outputted density with respect to metal data file.\n\n";
 }

@@ -10,10 +10,11 @@
 
 using namespace std;
 
-void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
-    cout << "got here\n";
-    double average_l = metals_avg_left(time_steps);
-    double average_r = metals_avg_right(time_steps, info);
+void  degree_respect_metal(Args& args) {
+    Information& info = args.args_info;
+    TimeSteps& time_steps = args.args_time_steps;
+    double average_l = args.avg_left;
+    double average_r = args.avg_right;
     double metal_d = average_r - average_l;
     double water_z_d = info.lattice_z - metal_d;
     ofstream output;
@@ -30,7 +31,6 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
         degrees[i] = 0;
     }
     int total_counts = 0;
-    cout << "got here\n";
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
@@ -42,7 +42,6 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
             counts[bin] ++;
         }
     }
-    cout << "got here\n";
     for (int i = 0; i < n_bins; i ++) {
         if (counts[i]) {
             output << i*zinc << "\t" << degrees[i] / counts[i] << "\n";
@@ -52,7 +51,7 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
     }
     cout << "Outputted degree with respect to metal data file.\n\n";
     
-   // output.close();
+    output.close();
 }
 
 void  degree_respect_z(Args& args) {

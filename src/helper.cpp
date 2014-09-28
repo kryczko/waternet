@@ -137,19 +137,20 @@ void remove_zeros(vector<double>& dens, vector<double>& pos) {
 
 double find_max_m(M_vector& M_atoms, Information& info) {
     double val = 0;
+    double dummy;
     for (auto& M : M_atoms) {
         if (info.lattice_z - M.z_coords < 1 ) {
-            M.z_coords -= info.lattice_z;
+            dummy = M.z_coords - info.lattice_z;
         }
-        if (M.z_coords > val) {
-            val = M.z_coords;
+        if (dummy > val) {
+            val = dummy;
         }
     }
     return val;
 }
 
 double find_min_m(M_vector& M_atoms) {
-    double val = 100000; // some large value
+    double val = 1000; // some large value
     for (auto& M : M_atoms) {
         if (M.z_coords < val) {
             val = M.z_coords;

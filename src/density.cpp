@@ -67,7 +67,8 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
     }
     double zvol = info.lattice_x*info.lattice_y*zinc;
     ofstream zoutput;
-    zoutput.open("output/dens_from_metal.dat");
+    string filename = "output/dens_from_metal.dat";
+    zoutput.open(filename.c_str());
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;

@@ -105,6 +105,9 @@ struct Args {
     TimeStep arg_time_step;
     TimeSteps arg_time_steps;
     double avg_left, avg_right;
+    Args() {
+        avg_left = avg_right = 0;
+    }
 };
 
 #endif

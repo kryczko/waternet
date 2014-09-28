@@ -22,12 +22,14 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
     double zinc = 0.5 * water_z_d / (n_bins);
     vector<int> bincounts ( n_bins ), counts ( n_bins );
     vector<double> degrees ( n_bins );
+    cout << "got here\n";
     for (int i = 0; i < n_bins; i ++) {
         bincounts[i] = 0;
         counts[i] = 0;
         degrees[i] = 0;
     }
     int total_counts = 0;
+    cout << "got here\n";
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         for (int j = 0; j < Ovec.size(); j ++) {
@@ -39,6 +41,7 @@ void  degree_respect_metal(Information& info, TimeSteps& time_steps) {
             counts[bin] ++;
         }
     }
+    cout << "got here\n";
     for (int i = 0; i < n_bins; i ++) {
         if (counts[i]) {
             output << i*zinc << "\t" << degrees[i] / counts[i] << "\n";

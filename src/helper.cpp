@@ -182,7 +182,7 @@ double find_max_m(M_vector& M_atoms, Information& info) {
 }
 
 double find_min_m(M_vector& M_atoms) {
-    double val = 1000; // some large value
+    double val = 100.0; // some large value
     for (auto& M : M_atoms) {
         if (M.z_coords < val) {
             val = M.z_coords;

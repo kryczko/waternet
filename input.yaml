@@ -88,7 +88,7 @@ modules:
     # the plot outputted is the probability after some time (in ps) that you would
     # find a water molecule with the same partner
     # NOTE - for averaging purposes the num_starts is used here
-    network_reorganization_time: true
+    network_reorganization_time: false
     num_starts: 1000
     time_length: 3654 # - 0.1935: 1 ps = 5168 steps, - 0.2737: 1 ps = 3654 steps  ---- in timesteps, the function will average over this
     
@@ -97,7 +97,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_330.xyz      #
+    input: xyzfiles/platinum/pt_water_400.xyz      #
     #                                       #   
     #########################################
     

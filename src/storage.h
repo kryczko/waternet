@@ -28,7 +28,7 @@ struct Information {
         n_frames = num_oxygen = num_hydrogen = sdf_bins = -1;
         H_group_dynamics = OH_group_dynamics = write_unwrapped_xyz = sdf = network_reorganization_time = orientation_1D = create_edgelist = false;
         lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = cell_block_start = cell_block_end = -1.0; 
-        output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = fix_plots = full_msd = false;
+        output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = fix_plots = full_msd = network_reorganization_time = false;
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
         starting_z = time_length -1.0;
         num_cell_blocks = 1;

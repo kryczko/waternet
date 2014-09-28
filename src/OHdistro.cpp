@@ -11,8 +11,8 @@ using namespace std;
 
 void OHdistro(Args& args) {
     
-    Information& info = args.arg_info;
-    TimeSteps& time_steps = args.arg_time_steps;
+    Information info = args.arg_info;
+    TimeSteps time_steps = args.arg_time_steps;
     vector<int> bins ( info.OH_bins );
     int counter = 0;
     double binsize = info.max_OH / info.OH_bins;

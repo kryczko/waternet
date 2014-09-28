@@ -15,8 +15,8 @@ msd_vec msd_vector;
 
 void  msd(Args& args) {
     
-    Information& info = args.arg_info;
-    TimeSteps& time_steps = args.arg_time_steps;
+    Information info = args.arg_info;
+    TimeSteps time_steps = args.arg_time_steps;
     
     unwrap(info, time_steps);
     double incr = (info.cell_block_end - info.cell_block_start) / info.num_cell_blocks;

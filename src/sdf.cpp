@@ -13,8 +13,8 @@ using namespace std;
 
 void sdf(Args& args) {
     
-    Information& info = args.arg_info;
-    TimeSteps& time_steps = args.arg_time_steps;
+    Information info = args.arg_info;
+    TimeSteps time_steps = args.arg_time_steps;
     
     double Obins[info.sdf_bins][info.sdf_bins], Hbins[info.sdf_bins][info.sdf_bins];
     for (int i = 0; i < info.sdf_bins; i ++) {

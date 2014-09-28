@@ -2,7 +2,7 @@
 lattice_constants:
     x: 11.24
     y: 9.747
-    z: 45.687
+    z: 45.687   # pt - high density - 41.098 - regular - 45.687
 # enter the number of oxygen, hydrogen, and metal atoms
 n_atoms:
     O: 100
@@ -18,7 +18,7 @@ modules:
     # if you would like separate the supercell into blocks, enter the number here, if not use num_msd_blocks: 1. The modules that are effected by this are: output_gephi, mean_square_displacement, orientation_1D, degree_distro
     num_cell_blocks: 5
     cell_block_start: 13.0
-    cell_block_end: 45.0
+    cell_block_end: 41.0
     
     # to fix plots with interfaces set to true and declare the minimum distance you want to set the z-value to be to add a lattice constant --- #### This works for the degree_z and the z_density ###### ----
     fix_plots: true
@@ -63,13 +63,13 @@ modules:
     write_unwrapped_xyz: false # write out the unwrapped coordinates
     
     # create data files for contour plots of water molecule orientations
-    orientation_2D: false
+    orientation_2D: true
     orient_x_bins: 20
     orient_y_bins: 20
     orient_z_bins: 20
     
     # create data files for 1D plots of the orientation for different layers
-    orientation_1D: false
+    orientation_1D: true
     
     # run dynamical analysis on the H group - ONLY USE WITH AN H-GROUP XYZ FILE 
     H_group_dynamics: false
@@ -87,7 +87,7 @@ modules:
     # the plot outputted is the probability after some time (in ps) that you would
     # find a water molecule with the same partner
     # NOTE - for averaging purposes the num_starts is used here
-    network_reorganization_time: false
+    network_reorganization_time: true
     num_starts: 1000
     time_length: 3654 # - 0.1935: 1 ps = 5168 steps, - 0.2737: 1 ps = 3654 steps  ---- in timesteps, the function will average over this
     
@@ -96,7 +96,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/platinum/pt_water_330.xyz      #
+    input: xyzfiles/platinum/pt_water_400.xyz      #
     #                                       #   
     #########################################
     

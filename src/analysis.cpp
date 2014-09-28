@@ -53,7 +53,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
     }
     if (info.density) {
         density(args);
-        zdens_from_metal(info, time_steps);
+        //zdens_from_metal(info, time_steps);
     }
     if (info.msd) {
         msd(args);

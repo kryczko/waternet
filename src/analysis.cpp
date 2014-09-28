@@ -67,8 +67,13 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
         sdf(args);
     }
     if (info.network_reorganization_time) {
+        cout << "in here\n";
         nrt(args);
     }
+    
+    zdens_from_metal(args);
+    degree_respect_metal(args);
+    
     
 
     return true;

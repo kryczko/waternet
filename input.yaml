@@ -1,8 +1,9 @@
 # enter the lattice constants for your supercell
+# pt - high density - 41.098 - regular - 45.687
 lattice_constants:
     x: 11.24
     y: 9.747
-    z: 45.687   # pt - high density - 41.098 - regular - 45.687
+    z: 45.687   
 # enter the number of oxygen, hydrogen, and metal atoms
 n_atoms:
     O: 100

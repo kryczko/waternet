@@ -57,7 +57,7 @@ void  zdens_from_metal(Information& info, TimeSteps& time_steps) {
     }
     
     cout << "got here\n";
-    //zoutput.close();
+    zoutput.close();
     cout << "Outputted density with respect to metal data file.\n\n";
 }
 

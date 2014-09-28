@@ -15,16 +15,17 @@ void  degree_respect_metal(Args& args) {
     TimeSteps& time_steps = args.arg_time_steps;
     double average_l = args.avg_left;
     double average_r = args.avg_right;
+    cout << average_l << "\t" << average_r << "\n";
     double metal_d = average_r - average_l;
     double water_z_d = info.lattice_z - metal_d;
     ofstream output;
     string filename = "output/degree_wrt_metal.dat";
     output.open(filename.c_str());
+    
     int n_bins = info.degree_bins / 2;
     double zinc = 0.5 * water_z_d / (n_bins);
     vector<int> bincounts ( n_bins ), counts ( n_bins );
     vector<double> degrees ( n_bins );
-    cout << "got here\n";
     for (int i = 0; i < n_bins; i ++) {
         bincounts[i] = 0;
         counts[i] = 0;

@@ -51,17 +51,13 @@ void orientation_1D(Args& args) {
                 }
             }
         }
-        int angle_bin[180] = {};
+        int angle_bin[180/3] = {};
         double count = 0;
         for (int i = 0; i < vecx.size(); i ++) {
             double dot = vecz[i];
             double norm = sqrt( vecx[i]*vecx[i] + vecy[i]*vecy[i] + vecz[i]*vecz[i] );
             double angle = acos ( dot / ( norm ) ) * rtd;
-        
-            //if (vecx[i] < 0 || vecy[i] < 0) {
-              //  angle += 180.0;
-            //}
-            angle_bin[(int) angle] ++;
+            angle_bin[(int) (angle/3.0)] ++;
             count ++;
         
         }
@@ -70,8 +66,8 @@ void orientation_1D(Args& args) {
         output.open(filename.c_str());
         output << "# 1D orientation for region " << cell << "\n";
         output << "# Region is from " << start_z << " to " << end_z << "\n\n";
-        for (int i = 0 ; i < 180; i ++) {
-            output << cos((double) i / rtd) << "   " << angle_bin[i] / count << "\n";
+        for (int i = 0 ; i < 180/3; i ++) {
+            output << cos((double) i*3 / rtd) << "   " << angle_bin[i] / count << "\n";
         }
         output.close();
     }

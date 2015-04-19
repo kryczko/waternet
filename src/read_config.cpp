@@ -28,6 +28,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "cell_block_end", info.cell_block_end);
     parse(modules, "output_gephi", info.output_gephi);
     parse(modules, "degree_z", info.degree_z);
+    parse(modules, "degree_z_from_metal", info.degree_z_from_metal);
     parse(modules, "degree_bins", info.degree_bins);
     parse(modules, "fix_plots", info.fix_plots);
     parse(modules, "starting_z", info.starting_z);
@@ -42,6 +43,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "degree_distro", info.degree_distro);
     parse(modules, "num_cell_blocks", info.num_cell_blocks);
     parse(modules, "density", info.density);
+    parse(modules, "density_from_metal", info.density_from_metal);
     parse(modules, "density_bins", info.density_bins);
     parse(modules, "heavy_water", info.heavy_water);
     parse(modules, "mean_square_displacement", info.msd);

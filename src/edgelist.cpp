@@ -5,6 +5,8 @@
 #include <pthread.h>
 #include "storage.h"
 #include "helper.h"
+#include "omp.h"
+
 using namespace std;
 
 
@@ -88,59 +90,20 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
     if (!info.create_edgelist) {
         return false;
     }
-   // cout << "--- Edgelist progress ---\n";
-    //pthread_t threads[info.num_threads];
-    // OPENMP parallelization
+
     int chunk = time_steps.size() / info.num_threads;
-    //omp_set_dynamic(0);
-    //omp_set_num_threads(info.num_threads);
+    omp_set_num_threads(info.num_threads);
     int begin, end;
-    
-    //#pragma omp parallel for 
+    #pragma omp parallel for 
     for (int i = 0; i < info.num_threads; i ++) {
         begin = i*chunk;
-        if ((i+1)*chunk > time_steps.size()){
+        if (i == info.num_threads - 1) {
             end = time_steps.size();
         } else {
             end = (i+1)*chunk;
         }
         perform(info, time_steps, begin, end);
-        //int thread = pthread_create(&threads[i], NULL, perform, (void *) &args);
-        //if (thread) {
-            //cout << "Error with thread.\n";
-        //}
     }
-    //for (auto& th: threads) {
-      //  pthread_join(th, NULL);
-   // }
-    /*for (int i = 0; i < time_steps.size(); i ++) {
-        O_vector& Ovec = time_steps[i].O_atoms;
-        H_vector& Hvec = time_steps[i].H_atoms;
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            nearest_neighbors(info, O, Ovec);
-        }
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            find_local_H(info, O, Hvec);
-        }
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            find_H_bonds(O, Hvec, Ovec, info);
-        }
-        for (int j = 0; j < Ovec.size(); j ++) {
-            Oxygen& O = Ovec[j];
-            check_final_bonds(O, Ovec, Hvec, info);
-        }
-        /*if (i < time_steps.size()) {
-            cout << "--- |< " << (int) ( 100 * (double) i / (double) time_steps.size()) << " % >| ---\r";
-            flush(cout);
-        } else if (i == time_steps.size() - 1) {
-            cout << "--- |< 100 % >| ---\n";
-            flush(cout);
-        }    
-    }
-    cout << "--- |< 100 % >| ---\n\n";*/
     cout << "Computed nearest neighbour lists...\n\n";    
     return true;
 }

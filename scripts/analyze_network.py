@@ -70,7 +70,7 @@ def run_main():
     ad = []
     second_counter = 0
     for edgelist in total_edgelist: 
-        if (second_counter % 100 == 0):
+        if (second_counter % 10 == 0):
             Directed_G = nx.DiGraph(edgelist)
             Undirected_G = Directed_G.to_undirected()
             #plt.figure(figsize=(8,8))
@@ -82,11 +82,8 @@ def run_main():
             average_clustering += compute_clustering_coefficient(Directed_G, Undirected_G)
             average_path_length += average_shortest_path(Directed_G, Undirected_G)
             #average_diameter += nx.diameter(Undirected_G);
-            num_edges = 0
-            for node in Undirected_G:
-                num_edges += len(Undirected_G.neighbors(node))
-            average_number_of_edges += num_edges;
-            average_number_of_nodes += nx.number_of_nodes(Directed_G);
+            average_number_of_edges += nx.number_of_edges(Undirected_G);
+            average_number_of_nodes += nx.number_of_nodes(Undirected_G);
             average_degree = float(average_number_of_edges) / average_number_of_nodes
             print "Timestep: ", second_counter
             #print "Average diameter:", average_diameter / (counter + 1)
@@ -97,7 +94,6 @@ def run_main():
             apl.append(average_path_length / (counter + 1))
             print "Average number of edges:", float(average_number_of_edges) / (counter + 1)
             ae.append(average_number_of_edges / (counter + 1))
-	    print "Average degree:", float(average_number_of_edges) / average_number_of_nodes
             print "Average number of nodes involved in network:", float(average_number_of_nodes) / (counter + 1)
             an.append(average_number_of_nodes / (counter + 1))
             print "Degrees:\n[0, 1, 2, 3, 4, 5 ,6 ]"

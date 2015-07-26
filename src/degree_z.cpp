@@ -46,7 +46,7 @@ void  degree_respect_metal(Args& args) {
     }
     for (int i = 0; i < n_bins; i ++) {
         if (counts[i]) {
-            output << i*zinc << "\t" << degrees[i] / counts[i] << "\n";
+            output << i*zinc << "\t" << 2.0 * degrees[i] / counts[i] << "\n";
         } else {
             output << i*zinc << "\t" << 0 << "\n";
         }

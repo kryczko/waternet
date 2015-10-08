@@ -2,18 +2,18 @@
 # pt - high density - 41.098 - regular - 45.687
 # C  - 12.41 , 12.81, 36.21
 lattice_constants:
-    x: 13.41
-    y: 13.81
-    z: 37.036
+    x: 11.24
+    y: 9.74
+    z: 45.69
 # enter the number of oxygen, hydrogen, and metal atoms
 n_atoms:
     O: 100
     H: 200
-    metal: 300
+    metal: 112
 
 # perform which modules?
 modules:
-    metal: C
+    metal: Pt
     num_threads: 4
     # this module creates a neighbor list for the water molecules from the xyz file, it is needed for most other modules. 
     create_edgelist: true    
@@ -101,7 +101,7 @@ filenames:
     
     ######## YOUR INPUT XYZ FILE ############
     #                                       #
-    input: xyzfiles/amorphC-water.xyz      #
+    input: pt-water-PBE-330.xyz      #
     #                                       #   
     #########################################
     

@@ -8,3 +8,4 @@ yaml*
 *.xyz
 *.xml
 graphs
+yaml-cpp/

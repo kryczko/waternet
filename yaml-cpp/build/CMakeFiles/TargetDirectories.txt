@@ -1,3 +1,0 @@
-/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/debuggable.dir
-/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/releasable.dir
-/Users/kryczko/git/waternet/yaml-cpp/build/CMakeFiles/yaml-cpp.dir

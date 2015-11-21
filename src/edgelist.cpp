@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include "storage.h"
 #include "helper.h"
-#include "omp.h"
+//#include "omp.h"
 
 using namespace std;
 
@@ -92,9 +92,9 @@ bool create_edgelist(Information& info, TimeSteps& time_steps) {
     }
 
     int chunk = time_steps.size() / info.num_threads;
-    omp_set_num_threads(info.num_threads);
+    //omp_set_num_threads(info.num_threads);
     int begin, end;
-    #pragma omp parallel for 
+    //#pragma omp parallel for 
     for (int i = 0; i < info.num_threads; i ++) {
         begin = i*chunk;
         if (i == info.num_threads - 1) {

@@ -4,7 +4,7 @@
 #include <string>
 #include <pthread.h>
 #include <vector>
-#include "omp.h"
+//#include "omp.h"
 
 #include "storage.h"
 #include "edgelist.h"
@@ -24,6 +24,38 @@
 #include "output_edgelist.h"
 
 using namespace std;
+
+void ODownHDown(Args& args) {
+    Information& info = args.arg_info;
+    TimeSteps& time_steps = args.arg_time_steps;
+    double average_left = args.avg_left + info.lattice_z;
+    double average_right = args.avg_right;
+    double metal_dist = average_right - (average_left - info.lattice_z);
+    double max_dist = 3.0; // Static for now; in Angstroms
+    double distro[2] = {0}; // 0 == O, 1 == H
+    for (int i = 0; i < time_steps.size(); i ++) {
+        O_vector& Ovec = time_steps[i].O_atoms;
+        H_vector& Hvec = time_steps[i].H_atoms;
+        for (int k = 0; k < Ovec.size(); k ++) {
+            Oxygen& O = Ovec[k];
+            double dist1 = abs(O.z_coords - average_left);
+            double dist2 = abs(O.z_coords - average_right);
+            double dist_from_closest_metal = min(dist1, dist2);
+            if (dist_from_closest_metal < max_dist) {
+                vector<int> bonded_H = Ovec[k].bonded_H_neighbors;
+                for (int j = 0; j < bonded_H.size(); j ++) {
+                    Hydrogen& H = Hvec[bonded_H[j]];
+                    if (O.z_coords < H.z_coords) {
+                        distro[0] ++;
+                    } else {
+                        distro[1] ++;
+                    }
+                }
+            }
+        }
+    }
+    cout << distro[0] << "\t" << distro[1] << "\n";
+}
 
 bool main_analysis(Information& info, TimeSteps& time_steps) {
     Args args;
@@ -118,10 +150,11 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
         function_ptr = &zdens_from_metal;
         function_ptrs.push_back(function_ptr);
     }    
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int i = 0; i < function_ptrs.size(); i ++) {
         function_ptrs[i](args);
     }
+    ODownHDown(args);
 
     return true;
 }

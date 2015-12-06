@@ -4,6 +4,7 @@
 #include <string>
 #include <pthread.h>
 #include <vector>
+#include <iomanip>
 //#include "omp.h"
 
 #include "storage.h"
@@ -31,8 +32,10 @@ void ODownHDown(Args& args) {
     double average_left = args.avg_left + info.lattice_z;
     double average_right = args.avg_right;
     double metal_dist = average_right - (average_left - info.lattice_z);
-    double max_dist = 3.0; // Static for now; in Angstroms
+    double max_dist = 5.0; // Static for now; in Angstroms
     double distro[2] = {0}; // 0 == O, 1 == H
+    double sep_distros[time_steps.size()][2] = {0};
+    double inc = 1.0;
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
@@ -46,15 +49,52 @@ void ODownHDown(Args& args) {
                 for (int j = 0; j < bonded_H.size(); j ++) {
                     Hydrogen& H = Hvec[bonded_H[j]];
                     if (O.z_coords < H.z_coords) {
+                        sep_distros[(int)(i / inc)][0] ++;
                         distro[0] ++;
                     } else {
+                        sep_distros[(int)(i / inc)][1] ++;
                         distro[1] ++;
                     }
                 }
             }
         }
     }
-    cout << distro[0] << "\t" << distro[1] << "\n";
+    vector<double> Odistro, Hdistro;
+    for (int i = 0; i < time_steps.size(); i ++) {
+        Odistro.push_back(sep_distros[i][0]);
+        Hdistro.push_back(sep_distros[i][1]);
+    }
+
+    double max_O = max(Odistro);
+    int n_bins = max_O;
+    double incr = max_O / n_bins;
+
+    // to check for Gaussian distro
+    // int other_distro[n_bins] = {0};
+    // for (int i = 0; i < time_steps.size(); i ++) {
+    //     other_distro[(int) (Odistro[i] / incr) ] ++;
+    // }
+    // for (int i = 0; i < n_bins; i ++) {
+    //     cout << other_distro[i] << "\n";
+    // }
+
+    ofstream output;
+    output.open("output/ODown.dat");
+    for (auto& val : Odistro) {
+        output << val << "\n";
+    }
+    output.close();
+    output.open("output/HDown.dat");
+    for (auto& val : Hdistro) {
+        output << val << "\n";
+    }
+    output.close();
+    output.open("output/ODownHDownSummary.dat");
+    output << "Average\tStandard Dev.\tStandard Err.\n-------------------------------------\n\n";
+    output << "ODown: " << average(Odistro) << "\t" << standardDeviation(Odistro) << "\t" << standardError(Odistro) << "\n";
+    output << "HDown: " << average(Hdistro) << "\t" << standardDeviation(Hdistro) << "\t" << standardError(Hdistro) << "\n";
+    output << "Totals:\n" << "ODown: "<< distro[0] << "\nHDown: " << distro[1] << "\n";
+    output.close();
 }
 
 bool main_analysis(Information& info, TimeSteps& time_steps) {

@@ -1,6 +1,7 @@
 #include "storage.h"
 #include "analysis.h"
 #include "helper.h"
+#include "density.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -21,10 +22,11 @@ void orientation_1D(Args& args) {
         double start_z = info.cell_block_start + cell*incr;
         double end_z = info.cell_block_start + (cell+1)*incr;
         
-        vector<double> posx, posy, posz, vecx, vecy, vecz;
+        vector<double> posx, posy, posz, vecx, vecy, vecz, counts;
         for (int i = 0; i < time_steps.size(); i ++) {
             O_vector& Ovec = time_steps[i].O_atoms;
             H_vector& Hvec = time_steps[i].H_atoms;
+            int count = 0;
             for (int j = 0; j < Ovec.size(); j++) {
                 Oxygen& O = Ovec[j];
                 if (O.local_H_neighbors.size() == 2 && O.z_coords > start_z && O.z_coords < end_z) {
@@ -48,26 +50,36 @@ void orientation_1D(Args& args) {
                     posx.push_back(wrap(O.x_coords + (ohx1 + ohx2) / 2, info.lattice_x));
                     posy.push_back(wrap(O.y_coords + (ohy1 + ohy2) / 2, info.lattice_y));
                     posz.push_back(wrap(O.z_coords + (ohz1 + ohz2) / 2, info.lattice_z));
+                    count ++;
                 }
             }
+            counts.push_back(count);
         }
         int angle_bin[180/3] = {};
-        double count = 0;
-        for (int i = 0; i < vecx.size(); i ++) {
-            double dot = vecz[i];
-            double norm = sqrt( vecx[i]*vecx[i] + vecy[i]*vecy[i] + vecz[i]*vecz[i] );
-            double angle = acos ( dot / ( norm ) ) * rtd;
-            angle_bin[(int) (angle/3.0)] ++;
-            count ++;
-        
+        int count = 0;
+        vector<AllDistros> all_distros(info.num_cell_blocks);
+        for (int i = 0; i < counts.size(); i ++ ) {
+            DensityDistro density_distro(60);
+            for (int j = 0; j < counts[i]; j ++) {
+                double dot = vecz[count];
+                double norm = sqrt( vecx[count]*vecx[count] + vecy[count]*vecy[count] + vecz[count]*vecz[count] );
+                double angle = acos ( dot / ( norm ) ) * rtd;
+                angle_bin[(int) (angle/3.0)] ++;
+                density_distro.distro[(int) (angle/3.0)] ++;
+                count ++;
+            }
+            density_distro.normalize();
+            all_distros[cell].all_distros.push_back(density_distro);
         }
         ofstream output;
         string filename = "output/orientation_1D_region_" + to_string(cell) + ".dat";
         output.open(filename.c_str());
         output << "# 1D orientation for region " << cell << "\n";
         output << "# Region is from " << start_z << " to " << end_z << "\n\n";
+        vector<double> std_err = all_distros[cell].std_err();
+        vector<double> avg_orient = all_distros[cell].avg_distro();
         for (int i = 0 ; i < 180/3; i ++) {
-            output << cos((double) i*3 / rtd) << "   " << angle_bin[i] / count << "\n";
+            output << cos((double) i*3 / rtd) << "   " << avg_orient[i] << "\t" << std_err[i] << "\n";
         }
         output.close();
     }

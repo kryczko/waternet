@@ -8,6 +8,15 @@
 
 using namespace std;
 
+int n_times(int total) {
+    int count = 0;
+    while (total > 10) {
+        total /= 2.0;
+        count ++;
+    }
+    return count;
+}
+
 double metals_avg_right(TimeSteps& time_steps, Information& info) {
     double sum = 0;
     double counter = 0;
@@ -113,29 +122,11 @@ double angle_between(Oxygen& O1, Oxygen& O2, Hydrogen& H, Information& info) {
     return angle;
 }
 
-double average(vector<double>& vec) {
-    double sum = 0;
-    for (double& elem : vec) {
-        sum += elem;
-    }
-    return sum / vec.size(); 
-}
-
 vector<int> set_zero(vector<int>& vec) {
     for (int i = 0; i < vec.size(); i ++) {
         vec[i] = 0;
     }
     return vec;
-}
-
-int max(vector<int> vec) {
-    int max = 0;
-    for (int i = 0; i < vec.size(); i ++) {
-        if (vec[i] > max) {
-            max = vec[i];
-        }
-    }
-    return max;
 }
 
 int num_edges(O_vector& Ovec) {

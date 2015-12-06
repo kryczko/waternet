@@ -1,6 +1,7 @@
 #include "storage.h"
 #include "analysis.h"
 #include "helper.h"
+#include "density.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,49 +10,6 @@
 #include <cstdlib>
 
 using namespace std;
-
-class DensityDistro {
-public:
-    vector<double> distro;
-    DensityDistro(int nbins) {
-        for (int i = 0; i < nbins; i ++) {
-            distro.push_back(0.0);
-        }
-    }
-};
-
-class AllDistros {
-public:
-    vector<double> z;
-    vector<DensityDistro> all_distros;
-
-    vector<double> avg_distro() {
-        DensityDistro return_distro(this->all_distros[0].distro.size());
-        for (auto& d : this->all_distros) {
-            for (int i = 0; i < d.distro.size(); i ++) {
-                return_distro.distro[i] += d.distro[i];
-            }
-        }
-        for (auto& elem : return_distro.distro) {
-            elem /= (double) this->all_distros.size();
-        }
-        return return_distro.distro;
-    }
-
-    vector<double> std_dev() {
-        DensityDistro return_distro(this->all_distros[0].distro.size());
-        vector<double> averages = this->avg_distro();
-        for (auto& d : this->all_distros) {
-            for (int i = 0; i < d.distro.size(); i ++) {
-                return_distro.distro[i] += pow(d.distro[i] - averages[i], 2);
-            }
-        }
-        for (auto& elem : return_distro.distro) {
-            elem = sqrt(elem / (double) this->all_distros.size());
-        }
-        return return_distro.distro;
-    }
-};
 
 void  zdens_from_metal(Args& args) {
     Information& info = args.arg_info;
@@ -104,9 +62,9 @@ void  zdens_from_metal(Args& args) {
         all_distros.all_distros.push_back(density_distro);
 
     }
-    vector<double> std_dev = all_distros.std_dev();
+    vector<double> std_err = all_distros.std_err();
     for (int i = 0; i < nbins; i ++) {
-        output << i*zinc << "\t" << zbins[i]*conversion / (2*zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (2*zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (2*zvol*info.n_frames) << "\t" << std_dev[i]*conversion / (2*zvol) << "\n";  
+        output << i*zinc << "\t" << zbins[i]*conversion / (2*zvol*info.n_frames) << "\t" << O_zbins[i]*O_conversion / (2*zvol*info.n_frames) << "\t" << H_zbins[i]*H_conversion / (2*zvol*info.n_frames) << "\t" << std_err[i]*conversion / (2*zvol) << "\n";  
     }
     output.close();
     cout << "Outputted density with respect to metal data file.\n\n";

@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <vector>
 #include <iomanip>
-//#include "omp.h"
+#include "omp.h"
 
 #include "storage.h"
 #include "edgelist.h"
@@ -27,36 +27,75 @@
 using namespace std;
 
 void ODownHDown(Args& args) {
+    bool ODownOutput = true, HDownOutput = true;
     Information& info = args.arg_info;
     TimeSteps& time_steps = args.arg_time_steps;
+    int midway = time_steps.size() / 2;
     double average_left = args.avg_left + info.lattice_z;
     double average_right = args.avg_right;
     double metal_dist = average_right - (average_left - info.lattice_z);
     double max_dist = 5.0; // Static for now; in Angstroms
     double distro[2] = {0}; // 0 == O, 1 == H
-    double sep_distros[time_steps.size()][2] = {0};
+    const int n_steps = time_steps.size();
+    double sep_distros[n_steps][2] = {0};
     double inc = 1.0;
     for (int i = 0; i < time_steps.size(); i ++) {
         O_vector& Ovec = time_steps[i].O_atoms;
         H_vector& Hvec = time_steps[i].H_atoms;
         for (int k = 0; k < Ovec.size(); k ++) {
+            int local_count = 0;
             Oxygen& O = Ovec[k];
             double dist1 = abs(O.z_coords - average_left);
             double dist2 = abs(O.z_coords - average_right);
             double dist_from_closest_metal = min(dist1, dist2);
             if (dist_from_closest_metal < max_dist) {
-                vector<int> bonded_H = Ovec[k].bonded_H_neighbors;
+                vector<int> bonded_H = Ovec[k].local_H_neighbors;
+                if (bonded_H.size() == 2) {
                 for (int j = 0; j < bonded_H.size(); j ++) {
                     Hydrogen& H = Hvec[bonded_H[j]];
-                    if (O.z_coords < H.z_coords) {
-                        sep_distros[(int)(i / inc)][0] ++;
-                        distro[0] ++;
-                    } else {
-                        sep_distros[(int)(i / inc)][1] ++;
-                        distro[1] ++;
+                    if ((O.z_coords < H.z_coords && (O.z_coords / info.lattice_z) < 0.5) || (O.z_coords > H.z_coords && (O.z_coords / info.lattice_z) > 0.5)) {
+                        local_count += 1;
                     }
                 }
+                if (local_count == 2) {
+                    if (ODownOutput && i > midway) {
+                        ofstream ODownOutputFile;
+                        ODownOutputFile.open("output/ODown_POSCAR");
+                        M_vector& Mvec = time_steps[i].M_atoms;
+                        for (auto& M : Mvec) {
+                            ODownOutputFile << M.x_coords << "  " << M.y_coords << "  " << M.z_coords << "\n";
+                        }
+                        ODownOutputFile << O.x_coords << "  " << O.y_coords << "  " << O.z_coords << "\n";
+                        for (int Hindex : bonded_H) {
+                            Hydrogen& H = Hvec[Hindex];
+                            ODownOutputFile << H.x_coords << "  " << H.y_coords << "  " << H.z_coords << "\n";
+                        }
+                        ODownOutput = false;
+                        ODownOutputFile.close();
+                    }
+                    sep_distros[(int)(i / inc)][0] ++;
+                        distro[0] ++;
+                } else {
+                    if (HDownOutput && i > midway) {
+                        ofstream HDownOutputFile;
+                        HDownOutputFile.open("output/HDown_POSCAR");
+                        M_vector& Mvec = time_steps[i].M_atoms;
+                        for (auto& M : Mvec) {
+                            HDownOutputFile << M.x_coords << "  " << M.y_coords << "  " << M.z_coords << "\n";
+                        }
+                        HDownOutputFile << O.x_coords << "  " << O.y_coords << "  " << O.z_coords << "\n";
+                        for (int Hindex : bonded_H) {
+                            Hydrogen& H = Hvec[Hindex];
+                            HDownOutputFile << H.x_coords << "  " << H.y_coords << "  " << H.z_coords << "\n";
+                        }
+                        HDownOutput = false;
+                        HDownOutputFile.close();
+                    }
+                    sep_distros[(int)(i / inc)][1] ++;
+                    distro[1] ++;
+                }
             }
+        }
         }
     }
     vector<double> Odistro, Hdistro;
@@ -190,7 +229,7 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
         function_ptr = &zdens_from_metal;
         function_ptrs.push_back(function_ptr);
     }    
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < function_ptrs.size(); i ++) {
         function_ptrs[i](args);
     }

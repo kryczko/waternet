@@ -41,6 +41,18 @@ template <class T> double standardDeviation(vector<T>& v) {
     }
     return sqrt(std_sum / v.size());
 }
+
+template<class T> vector<T> makeUncorrelated(vector<T>& vec) {
+    int iter = n_times(vec.size()) - 1;
+    int num_of_blocks = pow(2, iter);
+    int size_of_block = vec.size() / num_of_blocks;
+
+    vector<T> avg_vecs = vec;
+    for (int i = 0; i < iter; i ++) {
+       avg_vecs = halfAveraged(avg_vecs);
+    }
+    return avg_vecs;
+}
  
 template <class T> double standardError(vector<T>& vec) {
     int iter = n_times(vec.size()) - 1;

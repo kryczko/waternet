@@ -35,7 +35,7 @@ void ODownHDown(Args& args) {
     double average_right = args.avg_right;
     double metal_dist = average_right - (average_left - info.lattice_z);
     double max_dist = 5.0; // Static for now; in Angstroms
-    double distro[2] = {0}; // 0 == O, 1 == H
+    double distro[3] = {0}; // 0 == O, 1 == H
     const int n_steps = time_steps.size();
     double sep_distros[n_steps][2] = {0};
     double inc = 1.0;
@@ -75,7 +75,7 @@ void ODownHDown(Args& args) {
                     }
                     sep_distros[(int)(i / inc)][0] ++;
                         distro[0] ++;
-                } else {
+                } else if (local_count == 0) {
                     if (HDownOutput && i > midway) {
                         ofstream HDownOutputFile;
                         HDownOutputFile.open("output/HDown_POSCAR");
@@ -93,15 +93,18 @@ void ODownHDown(Args& args) {
                     }
                     sep_distros[(int)(i / inc)][1] ++;
                     distro[1] ++;
+                } else {
+                    sep_distros[(int) (i / inc)][2] ++;
                 }
             }
         }
         }
     }
-    vector<double> Odistro, Hdistro;
+    vector<double> Odistro, Hdistro, noneDistro;
     for (int i = 0; i < time_steps.size(); i ++) {
         Odistro.push_back(sep_distros[i][0]);
         Hdistro.push_back(sep_distros[i][1]);
+        noneDistro.push_back(sep_distros[i][2]);
     }
 
     double max_O = max(Odistro);
@@ -128,6 +131,12 @@ void ODownHDown(Args& args) {
         output << val << "\n";
     }
     output.close();
+    output.open("output/inBetween.dat");
+    for (auto& val : noneDistro) {
+        output << val << "\n";
+    }
+    output.close();
+    
     output.open("output/ODownHDownSummary.dat");
     output << "Average\tStandard Dev.\tStandard Err.\n-------------------------------------\n\n";
     output << "ODown: " << average(Odistro) << "\t" << standardDeviation(Odistro) << "\t" << standardError(Odistro) << "\n";

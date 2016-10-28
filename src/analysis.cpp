@@ -102,9 +102,10 @@ void ODownHDown(Args& args) {
     }
     vector<double> Odistro, Hdistro, noneDistro;
     for (int i = 0; i < time_steps.size(); i ++) {
-        Odistro.push_back(sep_distros[i][0]);
-        Hdistro.push_back(sep_distros[i][1]);
-        noneDistro.push_back(sep_distros[i][2]);
+        double total = sep_distros[i][0] + sep_distros[i][1] + sep_distros[i][2];
+        Odistro.push_back(sep_distros[i][0] / total);
+        Hdistro.push_back(sep_distros[i][1] / total);
+        noneDistro.push_back(sep_distros[i][2] / total);
     }
 
     double max_O = max(Odistro);
@@ -141,6 +142,7 @@ void ODownHDown(Args& args) {
     output << "Average\tStandard Dev.\tStandard Err.\n-------------------------------------\n\n";
     output << "ODown: " << average(Odistro) << "\t" << standardDeviation(Odistro) << "\t" << standardError(Odistro) << "\n";
     output << "HDown: " << average(Hdistro) << "\t" << standardDeviation(Hdistro) << "\t" << standardError(Hdistro) << "\n";
+    output << "inBetween: " << average(noneDistro) << "\t" << standardDeviation(noneDistro) << "\t" << standardError(noneDistro) << "\n";
     output << "Totals:\n" << "ODown: "<< distro[0] << "\nHDown: " << distro[1] << "\n";
     output.close();
 }

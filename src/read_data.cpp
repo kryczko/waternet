@@ -42,13 +42,13 @@ bool read_datafile(Information& info, TimeSteps& time_steps) {
     
     string stuff;
     
-    while(!input.eof()) {
+    while(steps < s) {
         input >> stuff;
         H_vector& Hvec = time_steps[steps].H_atoms;
         O_vector& Ovec = time_steps[steps].O_atoms;
         M_vector& Mvec = time_steps[steps].M_atoms;
         
-        if (stuff == "H") {
+	if (stuff == "H") {
             Hydrogen& H = Hvec[n_hyd];
             H.ID = n_hyd;
             input >> H.x_coords >> H.y_coords >> H.z_coords;
@@ -64,9 +64,11 @@ bool read_datafile(Information& info, TimeSteps& time_steps) {
             M.name = info.metal;
             input >> M.x_coords >> M.y_coords >> M.z_coords;
             n_met ++;
-        } else if (n_hyd == info.num_hydrogen && n_oxy == info.num_oxygen && n_met == info.num_metals ) {
+        } 
+        
+        if (n_hyd == info.num_hydrogen && n_oxy == info.num_oxygen && n_met == info.num_metals) {
             steps ++;
-            n_hyd = 0;
+	    n_hyd = 0;
             n_oxy = 0;
             n_met = 0;
         } 

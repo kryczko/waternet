@@ -80,11 +80,11 @@ void  msd(Args& args) {
         for (int nb = 0; nb < info.num_blocks; nb ++) {
             starting_step = nb*length;
             final_step = starting_step + (int) info.msd_time / info.time_step;
-            if (info.full_msd) {
-                final_step = time_steps.size();
-            } else {
-                final_step = (nb + 1)*length;
-            }
+            // if (info.full_msd) {
+            //     final_step = time_steps.size();
+            // } else {
+            //     final_step = (nb + 1)*length;
+            // }
             O_vector& Ovec1 = time_steps[starting_step].O_atoms;
             H_vector& Hvec1 = time_steps[starting_step].H_atoms;
             vector<double>& msd_data = msd_vector[nb].msd_step;
@@ -142,17 +142,17 @@ void  msd(Args& args) {
         cout << "Cell block: " << cell + 1<<  " of " << info.num_cell_blocks << " --- |< 100% >| ---\n\n";
         vector<double> averaged_msd(0);
         vector<int> counts(0);
-        if (info.full_msd) {
-            for (int i = 0; i < time_steps.size(); i ++) {
-                averaged_msd.push_back(0);
-                counts.push_back(0);
-            }
-        } else {
-            for (int i = 0; i < length; i ++) {
-                averaged_msd.push_back(0);
-                counts.push_back(0);
-            }
+        // if (info.full_msd) {
+        //     for (int i = 0; i < time_steps.size(); i ++) {
+        //         averaged_msd.push_back(0);
+        //         counts.push_back(0);
+        //     }
+        // } else {
+        for (int i = 0; i < length; i ++) {
+            averaged_msd.push_back(0);
+            counts.push_back(0);
         }
+        // }
         for (int i = 0; i < info.num_blocks; i ++) {
                 vector<double>& msd_data = msd_vector[i].msd_step;
                 for (int j = 0; j < msd_data.size(); j ++) {

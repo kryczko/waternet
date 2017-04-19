@@ -50,6 +50,7 @@ void parse_inputfile(Information& info, const Node& node) {
     parse(modules, "time_step", info.time_step);
     parse(modules, "num_blocks", info.num_blocks);
     parse(modules, "full_msd", info.full_msd);
+    parse(modules, "msd_time", info.msd_time);
     parse(modules, "write_unwrapped_xyz", info.write_unwrapped_xyz);
     parse(modules, "orientation_2D", info.orientation);
     parse(modules, "orient_x_bins", info.orient_x_bins);

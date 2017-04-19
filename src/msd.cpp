@@ -79,6 +79,7 @@ void  msd(Args& args) {
         int starting_step, final_step;
         for (int nb = 0; nb < info.num_blocks; nb ++) {
             starting_step = nb*length;
+            final_step = starting_step + (int) info.msd_time / info.time_step;
             if (info.full_msd) {
                 final_step = time_steps.size();
             } else {

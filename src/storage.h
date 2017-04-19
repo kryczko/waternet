@@ -17,7 +17,7 @@ struct Information {
     std::string H_group_trajectory_filename, OH_group_trajectory_filename;
     std::string unwrapped_coords;
     bool sdf, network_reorganization_time, orientation_1D, full_msd, degree_z_from_metal, density_from_metal;
-    double sdf_start, sdf_end, starting_z, time_length;
+    double sdf_start, sdf_end, starting_z, time_length, msd_time;
     int sdf_bins, num_cell_blocks, num_starts, num_metals;
     std::string sdf_output, nrt_output;
     
@@ -30,7 +30,7 @@ struct Information {
         lattice_x = lattice_y = lattice_z = max_OO = max_OH = time_step = sdf_start = sdf_end = cell_block_start = cell_block_end = -1.0; 
         output_gephi = degree_z = OODistro = OHDistro = HOHDistro = degree_distro = density = heavy_water = msd = orientation = fix_plots = full_msd = network_reorganization_time = false;
         label_bins = degree_bins = OO_bins = num_blocks = OH_bins = HOH_bins = density_bins = orient_x_bins = orient_y_bins = orient_z_bins = 0;
-        starting_z = time_length -1.0;
+        starting_z = time_length = msd_time -1.0;
         num_cell_blocks = 1;
         num_starts = num_metals = -1;
     }

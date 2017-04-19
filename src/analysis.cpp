@@ -228,23 +228,26 @@ bool main_analysis(Information& info, TimeSteps& time_steps) {
         function_ptrs.push_back(function_ptr);
     }
     
-    args.avg_left = metals_avg_left(time_steps, info);
-    args.avg_right = metals_avg_right(time_steps, info);
-    
-    if (info.degree_z_from_metal) {
-        function_ptr = &degree_respect_metal;
-        function_ptrs.push_back(function_ptr);
-    }
+    if (info.num_metals > 0) {
+    	args.avg_left = metals_avg_left(time_steps, info);
+    	args.avg_right = metals_avg_right(time_steps, info);
+   
+   	if (info.degree_z_from_metal) {
+            function_ptr = &degree_respect_metal;
+            function_ptrs.push_back(function_ptr);
+    	}
 
-    if (info.density_from_metal) {
-        function_ptr = &zdens_from_metal;
-        function_ptrs.push_back(function_ptr);
+    	if (info.density_from_metal) {
+            function_ptr = &zdens_from_metal;
+            function_ptrs.push_back(function_ptr);
+    	}
     }    
     #pragma omp parallel for
     for (int i = 0; i < function_ptrs.size(); i ++) {
         function_ptrs[i](args);
     }
-    ODownHDown(args);
-
+    if (info.num_metals > 0) {
+    	ODownHDown(args);
+    }
     return true;
 }

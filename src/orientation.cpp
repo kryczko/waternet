@@ -55,7 +55,7 @@ void orientation_1D(Args& args) {
             }
             counts.push_back(count);
         }
-        int angle_bin[180/3] = {};
+        int angle_bin[60] = {};
         int count = 0;
         vector<AllDistros> all_distros(info.num_cell_blocks);
         for (int i = 0; i < counts.size(); i ++ ) {
@@ -64,8 +64,8 @@ void orientation_1D(Args& args) {
                 double dot = vecz[count];
                 double norm = sqrt( vecx[count]*vecx[count] + vecy[count]*vecy[count] + vecz[count]*vecz[count] );
                 double angle = acos ( dot / ( norm ) ) * rtd;
-                angle_bin[(int) (angle/3.0)] ++;
-                density_distro.distro[(int) (angle/3.0)] ++;
+                angle_bin[(int) (angle / 3)] ++;
+                density_distro.distro[(int) (angle / 3)] ++;
                 count ++;
             }
             density_distro.normalize();
@@ -78,8 +78,8 @@ void orientation_1D(Args& args) {
         output << "# Region is from " << start_z << " to " << end_z << "\n\n";
         vector<double> std_err = all_distros[cell].std_err();
         vector<double> avg_orient = all_distros[cell].avg_distro();
-        for (int i = 0 ; i < 180/3; i ++) {
-            output << cos((double) i*3 / rtd) << "   " << avg_orient[i] << "\t" << std_err[i] << "\n";
+        for (int i = 0 ; i < 60; i ++) {
+            output << cos((double) i * 3.0 / rtd) << "   " << avg_orient[i] << "\t" << std_err[i] << "\n";
         }
         output.close();
     }

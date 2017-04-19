@@ -151,7 +151,7 @@ void  msd(Args& args) {
         //         counts.push_back(0);
         //     }
         // } else {
-        for (int i = 0; i < length; i ++) {
+        for (int i = 0; i < (int) info.msd_time / info.time_step; i ++) {
             averaged_msd.push_back(0);
             counts.push_back(0);
         }
